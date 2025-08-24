@@ -1,4 +1,6 @@
-# 🚀 RAIDMASTER Local Build Instructions
+# 🚀 RAIDMASTER Build Instructions - UPDATED
+
+✅ **CONFIGURATION FIXED**: The missing `extra.eas.projectId` error has been resolved!
 
 Since GitHub Actions is experiencing service issues, here's how to build your APK locally or via Expo web interface.
 
