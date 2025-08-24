@@ -1,7 +1,7 @@
 # 🚀 RAIDMASTER Build Instructions - UPDATED
 
 ✅ **CONFIGURATION FIXED**: The missing `extra.eas.projectId` error has been resolved!
-✅ **EAS PROJECT CONFIGURED**: Project ID `4819f4f5-bfdc-4fa3-9c7b-1ac668e9c375` added
+✅ **EAS PROJECT CONFIGURED**: Project ID `d214280e-057c-4a97-8817-c3f07c099711` added
 ✅ **BUILD READY**: All configurations optimized for successful APK generation
 
 Since GitHub Actions is experiencing service issues, here's how to build your APK locally or via Expo web interface.
@@ -59,7 +59,7 @@ Enter your Expo account credentials
 ### Step 4: Initialize Project (If Needed)
 ```bash
 # Only run this if EAS says project not configured
-eas project:init --id 4819f4f5-bfdc-4fa3-9c7b-1ac668e9c375
+eas project:init --id d214280e-057c-4a97-8817-c3f07c099711
 ```
 
 ### Step 5: Build APK
@@ -126,14 +126,14 @@ If you see this error:
 eas login
 
 # Then initialize the project
-eas project:init --id 4819f4f5-bfdc-4fa3-9c7b-1ac668e9c375
+eas project:init --id d214280e-057c-4a97-8817-c3f07c099711
 
 # Then build
 eas build --platform android --profile preview
 ```
 
 ### "extra.eas.projectId field is missing" Error  
-This has been fixed! The project ID `4819f4f5-bfdc-4fa3-9c7b-1ac668e9c375` is now properly configured in:
+This has been fixed! The project ID `d214280e-057c-4a97-8817-c3f07c099711` is now properly configured in:
 - ✅ app.json
 - ✅ app.config.js (alternative config file)
 - ✅ .easrc (EAS CLI configuration)
