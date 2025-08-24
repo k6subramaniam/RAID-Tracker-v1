@@ -18,14 +18,12 @@
     "preview": {
       "distribution": "internal",
       "android": {
-        "buildType": "apk",
-        "buildConfiguration": "Release"
+        "buildType": "apk"
       }
     },
     "production": {
       "android": {
-        "buildType": "apk",
-        "buildConfiguration": "Release"
+        "buildType": "apk"
       },
       "ios": {
         "buildConfiguration": "Release"
