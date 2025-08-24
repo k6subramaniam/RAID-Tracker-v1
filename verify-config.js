@@ -47,7 +47,7 @@ try {
   const easJson = JSON.parse(fs.readFileSync(easJsonPath, 'utf8'));
   
   console.log('✅ eas.json found and parsed');
-  console.log(`   - CLI Version: ${easJson.cli.version}`);
+  console.log(`   - CLI Version: No CLI section (simplified config)`);
   console.log(`   - Build Profiles: ${Object.keys(easJson.build).join(', ')}`);
   
 } catch (error) {

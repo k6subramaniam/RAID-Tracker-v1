@@ -1,7 +1,4 @@
 {
-  "cli": {
-    "version": ">= 5.0.0"
-  },
   "build": {
     "development": {
       "developmentClient": true,
@@ -18,9 +15,6 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk"
-      },
-      "env": {
-        "NODE_ENV": "production"
       }
     },
     "production": {
@@ -29,9 +23,6 @@
       },
       "ios": {
         "buildConfiguration": "Release"
-      },
-      "env": {
-        "NODE_ENV": "production"
       }
     }
   },
