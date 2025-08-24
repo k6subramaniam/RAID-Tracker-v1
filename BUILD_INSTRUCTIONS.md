@@ -1,6 +1,8 @@
 # 🚀 RAIDMASTER Build Instructions - UPDATED
 
 ✅ **CONFIGURATION FIXED**: The missing `extra.eas.projectId` error has been resolved!
+✅ **EAS PROJECT CONFIGURED**: Project ID `4819f4f5-bfdc-4fa3-9c7b-1ac668e9c375` added
+✅ **BUILD READY**: All configurations optimized for successful APK generation
 
 Since GitHub Actions is experiencing service issues, here's how to build your APK locally or via Expo web interface.
 
@@ -54,9 +56,10 @@ eas login
 ```
 Enter your Expo account credentials
 
-### Step 4: Initialize Project
+### Step 4: Initialize Project (If Needed)
 ```bash
-eas project:init --id com.raidmaster.app
+# Only run this if EAS says project not configured
+eas project:init --id 4819f4f5-bfdc-4fa3-9c7b-1ac668e9c375
 ```
 
 ### Step 5: Build APK
@@ -115,6 +118,25 @@ Your RAIDMASTER app includes:
 - Samsung S25 Ultra optimizations
 
 ## 📋 Troubleshooting
+
+### "EAS project not configured" Error
+If you see this error:
+```bash
+# First login to Expo
+eas login
+
+# Then initialize the project
+eas project:init --id 4819f4f5-bfdc-4fa3-9c7b-1ac668e9c375
+
+# Then build
+eas build --platform android --profile preview
+```
+
+### "extra.eas.projectId field is missing" Error  
+This has been fixed! The project ID `4819f4f5-bfdc-4fa3-9c7b-1ac668e9c375` is now properly configured in:
+- ✅ app.json
+- ✅ app.config.js (alternative config file)
+- ✅ .easrc (EAS CLI configuration)
 
 ### Build Fails
 - Ensure you're logged into Expo: `eas whoami`
