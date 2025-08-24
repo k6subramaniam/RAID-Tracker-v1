@@ -1,4 +1,8 @@
 {
+  "cli": {
+    "version": ">= 16.0.0",
+    "appVersionSource": "local"
+  },
   "build": {
     "development": {
       "developmentClient": true,
@@ -19,10 +23,14 @@
     },
     "production": {
       "android": {
-        "buildType": "apk"
+        "buildType": "app-bundle",
+        "gradleCommand": ":app:bundleRelease"
       },
       "ios": {
         "buildConfiguration": "Release"
+      },
+      "env": {
+        "EXPO_PUBLIC_ENV": "production"
       }
     }
   },

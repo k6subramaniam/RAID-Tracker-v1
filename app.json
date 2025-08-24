@@ -25,7 +25,14 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#1976d2"
-      }
+      },
+      "permissions": [],
+      "buildNumber": "1"
+    },
+    "ios": {
+      "bundleIdentifier": "com.raidmaster.app",
+      "buildNumber": "1.0.0",
+      "supportsTablet": true
     },
     "web": {
       "bundler": "metro"
