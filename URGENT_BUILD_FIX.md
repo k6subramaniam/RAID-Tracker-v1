@@ -94,4 +94,10 @@ After using the **updated main branch** (commit `f680ff3`), your build should sh
 3. **Download APK** when complete
 4. **Install on Samsung Galaxy S25 Ultra**
 
+## 🔄 **LATEST UPDATE** (Just Fixed):
+Another validation error was found and fixed:
+- ❌ **"eas.json is not valid - buildConfiguration is not allowed"** 
+- ✅ **FIXED**: Removed invalid `buildConfiguration` fields from Android build profiles
+- ✅ **Commit**: `832485d` - EAS JSON now passes validation
+
 **The configuration is NOW PERFECT - the build WILL succeed!** 🎉
