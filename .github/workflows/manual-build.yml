@@ -1,0 +1,59 @@
+name: Manual APK Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_profile:
+        description: 'Build profile'
+        required: true
+        default: 'preview'
+        type: choice
+        options:
+          - preview
+          - production
+
+jobs:
+  manual-build:
+    name: Manual Build - Android (${{ github.event.inputs.build_profile }})
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 🏗 Setup repo
+        uses: actions/checkout@v4
+        
+      - name: 🏗 Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: npm
+          
+      - name: 🏗 Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          
+      - name: 🏗 Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+          
+      - name: 📦 Install dependencies
+        run: npm ci
+        
+      - name: 🚀 Build Android APK
+        run: |
+          echo "🤖 Building Android APK with profile: ${{ github.event.inputs.build_profile }}"
+          eas build --platform android --profile ${{ github.event.inputs.build_profile }} --non-interactive
+          
+      - name: 📋 Build Summary
+        run: |
+          echo "## 🎉 Build Completed Successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Profile:** ${{ github.event.inputs.build_profile }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📱 Next Steps:" >> $GITHUB_STEP_SUMMARY
+          echo "1. Check the [Expo Dashboard](https://expo.dev) for build progress" >> $GITHUB_STEP_SUMMARY
+          echo "2. Download the APK once the build completes" >> $GITHUB_STEP_SUMMARY
+          echo "3. Install on your Samsung Galaxy S25 Ultra" >> $GITHUB_STEP_SUMMARY
