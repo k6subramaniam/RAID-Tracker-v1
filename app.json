@@ -26,8 +26,15 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#1976d2"
       },
-      "permissions": [],
-      "buildNumber": "1"
+      "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE"
+      ],
+      "buildNumber": "1",
+      "compileSdkVersion": 34,
+      "targetSdkVersion": 34,
+      "minSdkVersion": 21,
+      "icon": "./assets/icon.png"
     },
     "ios": {
       "bundleIdentifier": "com.raidmaster.app",
