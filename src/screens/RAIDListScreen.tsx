@@ -19,7 +19,7 @@ import {
   Divider,
   Button,
 } from 'react-native-paper';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import WebIcon from '../components/WebIcon';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useStore } from '../store';
