@@ -21,7 +21,7 @@ export default function App() {
       <SafeAreaProvider>
         <PaperProvider theme={ultraModernTheme}>
           <StatusBar style="light" backgroundColor={ultraModernTheme.colors.background} />
-          <AppNavigator />
+          <UltraModernNavigator />
         </PaperProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
