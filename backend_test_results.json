@@ -1,0 +1,101 @@
+{
+  "total": 8,
+  "passed": 7,
+  "failed": 1,
+  "success_rate": 87.5,
+  "results": [
+    {
+      "test": "Health Check",
+      "success": true,
+      "message": "Service is healthy - RAIDMASTER Multi-AI API",
+      "details": {
+        "status": "healthy",
+        "providers_count": 3,
+        "active_providers": 0
+      },
+      "timestamp": "2025-08-25 22:26:30"
+    },
+    {
+      "test": "Get Providers",
+      "success": true,
+      "message": "Retrieved 3 providers successfully",
+      "details": {
+        "provider_count": 3,
+        "provider_names": [
+          "OpenAI GPT-5",
+          "Claude Opus 4.1",
+          "Gemini 2.5 Pro"
+        ],
+        "sample_provider": {
+          "id": "openai_gpt5",
+          "name": "OpenAI GPT-5",
+          "provider": "openai",
+          "model": "gpt-5",
+          "api_key_masked": "sk-emerg...dEaC",
+          "enabled": true,
+          "status": "unknown",
+          "last_validated": null,
+          "created_at": null
+        }
+      },
+      "timestamp": "2025-08-25 22:26:30"
+    },
+    {
+      "test": "Add Provider",
+      "success": true,
+      "message": "Provider added successfully with ID: test_provider_08a1783c",
+      "details": {
+        "provider_id": "test_provider_08a1783c",
+        "message": "Provider added successfully"
+      },
+      "timestamp": "2025-08-25 22:26:30"
+    },
+    {
+      "test": "Update Provider",
+      "success": true,
+      "message": "Provider test_provider_08a1783c updated successfully",
+      "details": {
+        "message": "Provider updated successfully"
+      },
+      "timestamp": "2025-08-25 22:26:30"
+    },
+    {
+      "test": "Validate Provider",
+      "success": true,
+      "message": "Validation completed - Valid: False, Status: connection_error",
+      "details": {
+        "valid": false,
+        "status": "connection_error",
+        "message": "Connection failed: Failed to generate chat completion: litellm.AuthenticationError: AuthenticationError: OpenAIExceptio",
+        "response_time": 0.79
+      },
+      "timestamp": "2025-08-25 22:26:31"
+    },
+    {
+      "test": "Validate All Providers",
+      "success": true,
+      "message": "Validation started for 3 providers",
+      "details": {
+        "message": "Validation started for 3 providers",
+        "providers_count": 3
+      },
+      "timestamp": "2025-08-25 22:26:31"
+    },
+    {
+      "test": "Analyze Text",
+      "success": false,
+      "message": "Request error: HTTPConnectionPool(host='localhost', port=8001): Read timed out. (read timeout=30)",
+      "details": {},
+      "timestamp": "2025-08-25 22:27:01"
+    },
+    {
+      "test": "Delete Provider",
+      "success": true,
+      "message": "Provider test_provider_08a1783c deleted successfully",
+      "details": {
+        "message": "Provider deleted successfully"
+      },
+      "timestamp": "2025-08-25 22:27:03"
+    }
+  ]
+}
