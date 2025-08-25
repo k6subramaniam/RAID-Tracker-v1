@@ -4,7 +4,7 @@ import { PaperProvider } from 'react-native-paper';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import AppNavigator from './navigation/AppNavigator';
+import UltraModernNavigator from './navigation/UltraModernNavigator';
 import { useStore } from './store';
 import { ultraModernTheme } from './theme/ultraModern';
 
