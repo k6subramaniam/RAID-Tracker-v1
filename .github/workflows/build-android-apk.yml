@@ -1,0 +1,43 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: 'Build profile to use'
+        required: true
+        default: 'apk-unsigned'
+        type: choice
+        options:
+        - apk-unsigned
+        - development
+        - preview
+        - apk
+
+jobs:
+  build:
+    name: Build Android APK
+    runs-on: self-hosted
+    
+    steps:
+      - name: 📦 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Environment
+        run: npm ci || npm install
+
+      - name: 🔐 EAS Authentication
+        run: |
+          export EXPO_TOKEN="${{ secrets.EXPO_TOKEN }}"
+          npx eas whoami
+
+      - name: 🧹 Pre-build Cleanup
+        run: |
+          rm -rf android/app/build || true
+          rm -rf .expo || true
+
+      - name: 🚀 Build Android APK
+        run: |
+          export EXPO_TOKEN="${{ secrets.EXPO_TOKEN }}"
+          chmod +x ./build-android-apk.sh
+          ./build-android-apk.sh
