@@ -60,7 +60,8 @@ interface AppState {
   draftItem: Partial<RAIDItem> | null;
   setDraftItem: (draft: Partial<RAIDItem> | null) => void;
   
-  // Utility functions
+  // Initialization function to add sample data if store is empty
+  initializeSampleData: () => void;
   getFilteredItems: () => RAIDItem[];
   getItemsByType: (type: RAIDItem['type']) => RAIDItem[];
   getItemsByStatus: (status: RAIDItem['status']) => RAIDItem[];
