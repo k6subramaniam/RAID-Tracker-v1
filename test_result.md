@@ -129,12 +129,7 @@ metadata:
   test_sequence: 0
 
 test_plan:
-  current_focus:
-    - "Main Navigation - Bottom Tab Navigation"
-    - "RAID List Screen - Sample Data Loading"
-    - "Calculator Screen - Severity Calculator"
-    - "Create Item Flow - Multi-step Guided Flow"
-    - "AI Integration - Analysis Functionality"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
