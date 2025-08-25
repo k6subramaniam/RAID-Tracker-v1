@@ -88,7 +88,7 @@ const MainTabs: React.FC = () => {
         options={{
           title: 'RAID Items',
           tabBarIcon: ({ color, size }) => (
-            <Icon name="alert-circle-outline" size={size} color={color} />
+            <WebIcon name="alert-circle-outline" size={size} color={color} />
           ),
         }}
       />
