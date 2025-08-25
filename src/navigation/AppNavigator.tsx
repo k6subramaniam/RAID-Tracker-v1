@@ -108,7 +108,7 @@ const MainTabs: React.FC = () => {
         options={{
           title: 'Governance',
           tabBarIcon: ({ color, size }) => (
-            <Icon name="shield-check-outline" size={size} color={color} />
+            <WebIcon name="shield-check-outline" size={size} color={color} />
           ),
         }}
       />
