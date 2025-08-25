@@ -1,38 +1,24 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { PaperProvider } from 'react-native-paper';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { useStore } from './src/store';
+import { lightTheme, darkTheme } from './src/styles/theme';
+import AppNavigator from './src/navigation/AppNavigator';
 import { StatusBar } from 'expo-status-bar';
 
 export default function App() {
+  const { themeMode } = useStore();
+  
+  // Determine theme based on user preference
+  const theme = themeMode === 'dark' ? darkTheme : lightTheme;
+  
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>🛡️ RAIDMASTER</Text>
-      <Text style={styles.subtitle}>RAID Management System</Text>
-      
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>✅ Successfully Built!</Text>
-        <Text style={styles.description}>
-          Your RAIDMASTER APK has been successfully generated{'\n'}
-          and is ready for installation on Samsung Galaxy S25 Ultra.
-        </Text>
-      </View>
-
-      <View style={styles.features}>
-        <Text style={styles.featureTitle}>🎯 Core Features Ready:</Text>
-        <Text style={styles.feature}>• RAID Item Management</Text>
-        <Text style={styles.feature}>• AI-Powered Analysis</Text>
-        <Text style={styles.feature}>• Risk Assessment Matrix</Text>
-        <Text style={styles.feature}>• Executive Reporting</Text>
-        <Text style={styles.feature}>• Mobile-Optimized UI</Text>
-      </View>
-
-      <View style={styles.footer}>
-        <Text style={styles.version}>RAIDMASTER v1.0.0</Text>
-        <Text style={styles.platform}>Built with React Native & Expo</Text>
-        <Text style={styles.device}>Optimized for Samsung Galaxy S25 Ultra</Text>
-      </View>
-      
-      <StatusBar style="auto" />
-    </View>
+    <SafeAreaProvider>
+      <PaperProvider theme={theme}>
+        <AppNavigator />
+        <StatusBar style={themeMode === 'dark' ? 'light' : 'dark'} />
+      </PaperProvider>
+    </SafeAreaProvider>
   );
 }
 
