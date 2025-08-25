@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAIDMaster - AI-Enhanced Risk Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Dark Theme Color System */
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #161618;
+            --bg-tertiary: #1f1f23;
+            --bg-card: #262629;
+            --bg-hover: #2a2a2e;
+            
+            /* Text Colors */
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --text-inverse: #18181b;
+            
+            /* Accent Colors */
+            --accent-orange: #fb923c;
+            --accent-orange-hover: #f97316;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-purple: #8b5cf6;
+            --accent-red: #ef4444;
+            
+            /* Border Colors */
+            --border-primary: #27272a;
+            --border-secondary: #3f3f46;
+            --border-hover: #52525b;
+            
+            /* RAID Type Colors */
+            --risk-color: #ef4444;
+            --risk-bg: rgba(239, 68, 68, 0.1);
+            --issue-color: #f97316;
+            --issue-bg: rgba(249, 115, 22, 0.1);
+            --assumption-color: #3b82f6;
+            --assumption-bg: rgba(59, 130, 246, 0.1);
+            --dependency-color: #8b5cf6;
+            --dependency-bg: rgba(139, 92, 246, 0.1);
+            
+            /* Priority Colors */
+            --p0-color: #dc2626;
+            --p1-color: #ea580c;
+            --p2-color: #d97706;
+            --p3-color: #65a30d;
+            
+            /* Shadows & Effects */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.5);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.6);
+            
+            /* Glass Effects */
+            --glass-bg: rgba(38, 38, 41, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: 14px;
+            overflow-x: hidden;
+        }
+
+        /* Main Layout */
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-primary);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-orange-hover));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+
+        .nav-section {
+            margin-bottom: 32px;
+        }
+
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            padding: 0 20px 12px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-radius: 0;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border-right: 2px solid var(--accent-orange);
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--accent-orange);
+        }
+
+        .nav-icon {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-text {
+            font-weight: 500;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            padding: 20px;
+            border-top: 1px solid var(--border-primary);
+        }
+
+        .theme-button {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border: none;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .theme-button:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            min-height: 100vh;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-primary);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--accent-green);
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Content Area */
+        .content-area {
+            padding: 24px;
+            max-width: 1400px;
+        }
+
+        /* AI Analysis Section */
+        .ai-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-orange), transparent);
+        }
+
+        .ai-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .ai-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .ai-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .ai-text h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .ai-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Upload Area */
+        .upload-area {
+            border: 2px dashed var(--border-secondary);
+            border-radius: 12px;
+            padding: 48px 24px;
+            text-align: center;
+            background: var(--bg-tertiary);
+            margin-bottom: 24px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: var(--accent-orange);
+            background: var(--bg-hover);
+        }
+
+        .upload-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 20px;
+            color: var(--accent-orange);
+        }
+
+        .upload-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .upload-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* Text Analysis Area */
+        .text-area {
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .textarea-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .textarea-title {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .character-count {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .text-input {
+            width: 100%;
+            min-height: 200px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: 8px;
+            padding: 16px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 14px;
+            line-height: 1.6;
+            resize: vertical;
+            transition: border-color 0.2s ease;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: var(--accent-orange);
+        }
+
+        .text-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--accent-orange);
+            color: var(--text-inverse);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-orange-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border-secondary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+            border-color: var(--border-hover);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* RAID Dashboard */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--stat-gradient);
+        }
+
+        .stat-card.risk { --stat-gradient: var(--risk-color); }
+        .stat-card.issue { --stat-gradient: var(--issue-color); }
+        .stat-card.assumption { --stat-gradient: var(--assumption-color); }
+        .stat-card.dependency { --stat-gradient: var(--dependency-color); }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .stat-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .stat-icon.risk { background: var(--risk-bg); color: var(--risk-color); }
+        .stat-icon.issue { background: var(--issue-bg); color: var(--issue-color); }
+        .stat-icon.assumption { background: var(--assumption-bg); color: var(--assumption-color); }
+        .stat-icon.dependency { background: var(--dependency-bg); color: var(--dependency-color); }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .stat-change {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--accent-green);
+        }
+
+        /* RAID Items List */
+        .items-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 24px 24px 0;
+            display: flex;
+            align-items: center;
+            justify-content: between;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            flex: 1;
+        }
+
+        .items-list {
+            padding: 24px;
+        }
+
+        .item-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .item-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .item-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--item-accent);
+        }
+
+        .item-card.risk { --item-accent: var(--risk-color); }
+        .item-card.issue { --item-accent: var(--issue-color); }
+        .item-card.assumption { --item-accent: var(--assumption-color); }
+        .item-card.dependency { --item-accent: var(--dependency-color); }
+
+        .item-header {
+            display: flex;
+            align-items: center;
+            justify-content: between;
+            margin-bottom: 12px;
+        }
+
+        .item-type-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .item-type-badge.risk {
+            background: var(--risk-bg);
+            color: var(--risk-color);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .item-type-badge.issue {
+            background: var(--issue-bg);
+            color: var(--issue-color);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+        }
+
+        .item-type-badge.assumption {
+            background: var(--assumption-bg);
+            color: var(--assumption-color);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .item-type-badge.dependency {
+            background: var(--dependency-bg);
+            color: var(--dependency-color);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .priority-badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-inverse);
+        }
+
+        .priority-badge.p0 { background: var(--p0-color); }
+        .priority-badge.p1 { background: var(--p1-color); }
+        .priority-badge.p2 { background: var(--p2-color); }
+        .priority-badge.p3 { background: var(--p3-color); }
+
+        .item-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .item-meta {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .item-footer {
+            display: flex;
+            align-items: center;
+            justify-content: between;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-primary);
+        }
+
+        .owner-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .avatar {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-orange-hover));
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-inverse);
+        }
+
+        .ai-confidence {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--accent-purple);
+        }
+
+        /* Loading States */
+        .loading {
+            position: relative;
+            pointer-events: none;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 16px;
+            height: 16px;
+            margin: -8px 0 0 -8px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .content-area {
+                padding: 16px;
+            }
+
+            .ai-section {
+                padding: 24px 20px;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-in {
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Hidden state */
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">🛡️</div>
+                    <div class="logo-text">RAIDMaster</div>
+                </div>
+            </div>
+
+            <div class="nav-menu">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="#" class="nav-item active" data-page="dashboard">
+                        <span class="nav-icon">🏠</span>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="new-item">
+                        <span class="nav-icon">➕</span>
+                        <span class="nav-text">New RAID Item</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Management</div>
+                    <a href="#" class="nav-item" data-page="governance">
+                        <span class="nav-icon">🔗</span>
+                        <span class="nav-text">Governance Guide</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="reports">
+                        <span class="nav-icon">⬇️</span>
+                        <span class="nav-text">Reports</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Advanced</div>
+                    <a href="#" class="nav-item" data-page="ai-config">
+                        <span class="nav-icon">🤖</span>
+                        <span class="nav-text">AI Configuration</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="theme-toggle">
+                <button class="theme-button">
+                    <span>⚡</span>
+                    <span>Toggle theme</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <h1 class="page-title" id="page-title">Dashboard</h1>
+                <div class="top-actions">
+                    <div class="status-badge">
+                        <div class="status-dot"></div>
+                        <span id="backend-status">AI Backend Connected</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Dashboard Page -->
+                <div id="dashboard-page" class="page-content fade-in">
+                    <!-- Stats Grid -->
+                    <div class="dashboard-grid">
+                        <div class="stat-card risk">
+                            <div class="stat-header">
+                                <div class="stat-icon risk">🔴</div>
+                                <div class="stat-change">+12%</div>
+                            </div>
+                            <div class="stat-number">3</div>
+                            <div class="stat-label">Active Risks</div>
+                        </div>
+
+                        <div class="stat-card issue">
+                            <div class="stat-header">
+                                <div class="stat-icon issue">🟠</div>
+                                <div class="stat-change">-8%</div>
+                            </div>
+                            <div class="stat-number">2</div>
+                            <div class="stat-label">Open Issues</div>
+                        </div>
+
+                        <div class="stat-card assumption">
+                            <div class="stat-header">
+                                <div class="stat-icon assumption">🔵</div>
+                                <div class="stat-change">+5%</div>
+                            </div>
+                            <div class="stat-number">4</div>
+                            <div class="stat-label">Assumptions</div>
+                        </div>
+
+                        <div class="stat-card dependency">
+                            <div class="stat-header">
+                                <div class="stat-icon dependency">🟣</div>
+                                <div class="stat-change">+2%</div>
+                            </div>
+                            <div class="stat-number">1</div>
+                            <div class="stat-label">Dependencies</div>
+                        </div>
+                    </div>
+
+                    <!-- AI Analysis Section -->
+                    <div class="ai-section">
+                        <div class="ai-header">
+                            <div class="ai-title">
+                                <div class="ai-icon">🤖</div>
+                                <div class="ai-text">
+                                    <h2>AI-Powered RAID Analysis</h2>
+                                    <div class="ai-subtitle">Use AI to perform a comprehensive analysis of this RAID item for classification, impact, governance, and more.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Upload Area -->
+                        <div class="upload-area" onclick="triggerFileUpload()">
+                            <div class="upload-icon">📄</div>
+                            <div class="upload-title">Paste meeting notes, emails, or any text below. Or, upload a .docx or .pdf file. The AI will extract potential RAID items to create.</div>
+                            <div class="upload-subtitle">Supported formats: .docx, .pdf, plain text</div>
+                        </div>
+
+                        <!-- Text Analysis -->
+                        <div class="text-area">
+                            <div class="textarea-header">
+                                <div class="textarea-title">Paste your text here...</div>
+                                <div class="character-count" id="char-count">0 characters</div>
+                            </div>
+                            <textarea 
+                                class="text-input" 
+                                id="text-input"
+                                placeholder="Paste meeting notes, project updates, risk assessments, or any text that might contain RAID items. The AI will analyze and extract potential risks, assumptions, issues, and dependencies automatically."
+                                oninput="updateCharCount(this)"
+                            ></textarea>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" onclick="analyzeText()" id="analyze-btn">
+                                <span>🔍</span>
+                                <span>Analyze Text</span>
+                            </button>
+                            <button class="btn btn-secondary" onclick="uploadDocument()">
+                                <span>📎</span>
+                                <span>Upload .docx</span>
+                            </button>
+                            <button class="btn btn-secondary" onclick="uploadPDF()">
+                                <span>📊</span>
+                                <span>Upload .pdf</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- RAID Items -->
+                    <div class="items-section">
+                        <div class="section-header">
+                            <h2 class="section-title">RAID Dashboard</h2>
+                        </div>
+                        
+                        <div class="items-list">
+                            <div class="item-card risk">
+                                <div class="item-header">
+                                    <div class="item-type-badge risk">
+                                        <span>🔴</span>
+                                        <span>Risk</span>
+                                    </div>
+                                    <div class="priority-badge p1">P1</div>
+                                </div>
+                                <div class="item-title">API Rate Limiting Could Impact Performance</div>
+                                <div class="item-meta">
+                                    <div class="meta-item">
+                                        <span>📊</span>
+                                        <span>High Impact</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <span>📈</span>
+                                        <span>Medium Likelihood</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <span>⏰</span>
+                                        <span>Due in 5 days</span>
+                                    </div>
+                                </div>
+                                <div class="item-footer">
+                                    <div class="owner-info">
+                                        <div class="avatar">JS</div>
+                                        <span>Jane Smith • Engineering</span>
+                                    </div>
+                                    <div class="ai-confidence">
+                                        <span>🤖</span>
+                                        <span>92% AI Confidence</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="item-card issue">
+                                <div class="item-header">
+                                    <div class="item-type-badge issue">
+                                        <span>🟠</span>
+                                        <span>Issue</span>
+                                    </div>
+                                    <div class="priority-badge p0">P0</div>
+                                </div>
+                                <div class="item-title">Authentication Service Experiencing Downtime</div>
+                                <div class="item-meta">
+                                    <div class="meta-item">
+                                        <span>🚨</span>
+                                        <span>Critical Impact</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <span>⚡</span>
+                                        <span>In Progress</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <span>🔥</span>
+                                        <span>Overdue 2 hours</span>
+                                    </div>
+                                </div>
+                                <div class="item-footer">
+                                    <div class="owner-info">
+                                        <div class="avatar">SW</div>
+                                        <span>Sarah Wilson • Infrastructure</span>
+                                    </div>
+                                    <div class="ai-confidence">
+                                        <span>🤖</span>
+                                        <span>AI: Escalate Now</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="item-card assumption">
+                                <div class="item-header">
+                                    <div class="item-type-badge assumption">
+                                        <span>🔵</span>
+                                        <span>Assumption</span>
+                                    </div>
+                                    <div class="priority-badge p3">P3</div>
+                                </div>
+                                <div class="item-title">User Adoption Will Reach 40% by Q1</div>
+                                <div class="item-meta">
+                                    <div class="meta-item">
+                                        <span>📊</span>
+                                        <span>Medium Impact</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <span>🎯</span>
+                                        <span>Beta Feedback Based</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <span>📅</span>
+                                        <span>Q1 Target</span>
+                                    </div>
+                                </div>
+                                <div class="item-footer">
+                                    <div class="owner-info">
+                                        <div class="avatar">MJ</div>
+                                        <span>Mike Johnson • Product</span>
+                                    </div>
+                                    <div class="ai-confidence">
+                                        <span>🤖</span>
+                                        <span>Needs Validation</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="item-card dependency">
+                                <div class="item-header">
+                                    <div class="item-type-badge dependency">
+                                        <span>🟣</span>
+                                        <span>Dependency</span>
+                                    </div>
+                                    <div class="priority-badge p2">P2</div>
+                                </div>
+                                <div class="item-title">Design System Components Required for Frontend</div>
+                                <div class="item-meta">
+                                    <div class="meta-item">
+                                        <span>🔗</span>
+                                        <span>High Impact</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <span>⛔</span>
+                                        <span>Blocking Frontend</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <span>📅</span>
+                                        <span>Due in 12 days</span>
+                                    </div>
+                                </div>
+                                <div class="item-footer">
+                                    <div class="owner-info">
+                                        <div class="avatar">JD</div>
+                                        <span>John Doe • Design</span>
+                                    </div>
+                                    <div class="ai-confidence">
+                                        <span>🤖</span>
+                                        <span>Monitor Daily</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other pages would go here -->
+                <div id="new-item-page" class="page-content hidden">
+                    <h2>Create New RAID Item</h2>
+                    <p>Multi-step guided creation form would be here...</p>
+                </div>
+
+                <div id="governance-page" class="page-content hidden">
+                    <h2>Governance Guide</h2>
+                    <p>Governance policies and procedures would be here...</p>
+                </div>
+
+                <div id="reports-page" class="page-content hidden">
+                    <h2>Reports</h2>
+                    <p>Analytics and reporting dashboard would be here...</p>
+                </div>
+
+                <div id="ai-config-page" class="page-content hidden">
+                    <h2>AI Configuration</h2>
+                    <p>AI settings and configuration options would be here...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Hidden file input -->
+    <input type="file" id="file-input" style="display: none;" accept=".docx,.pdf" onchange="handleFileUpload(event)">
+
+    <script>
+        // Navigation functionality
+        function switchPage(pageId, title) {
+            // Hide all pages
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.add('hidden');
+            });
+            
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show selected page
+            const targetPage = document.getElementById(pageId + '-page');
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+                targetPage.classList.add('fade-in');
+            }
+            
+            // Update page title
+            document.getElementById('page-title').textContent = title;
+            
+            // Add active class to clicked nav item
+            const navItem = document.querySelector(`[data-page="${pageId}"]`);
+            if (navItem) {
+                navItem.classList.add('active');
+            }
+        }
+
+        // Add click listeners to nav items
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const pageId = item.dataset.page;
+                const title = item.querySelector('.nav-text').textContent;
+                switchPage(pageId, title);
+            });
+        });
+
+        // Character count functionality
+        function updateCharCount(textarea) {
+            const count = textarea.value.length;
+            document.getElementById('char-count').textContent = `${count} characters`;
+        }
+
+        // File upload functionality
+        function triggerFileUpload() {
+            document.getElementById('file-input').click();
+        }
+
+        function uploadDocument() {
+            document.getElementById('file-input').click();
+        }
+
+        function uploadPDF() {
+            document.getElementById('file-input').click();
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                console.log('File uploaded:', file.name);
+                // Handle file processing here
+                alert(`File "${file.name}" uploaded successfully! AI analysis would process this file.`);
+            }
+        }
+
+        // AI Analysis functionality
+        async function analyzeText() {
+            const textInput = document.getElementById('text-input');
+            const analyzeBtn = document.getElementById('analyze-btn');
+            const text = textInput.value.trim();
+            
+            if (!text) {
+                alert('Please enter some text to analyze.');
+                return;
+            }
+            
+            // Loading state
+            analyzeBtn.disabled = true;
+            analyzeBtn.classList.add('loading');
+            analyzeBtn.innerHTML = '<span>🤖</span><span>Analyzing...</span>';
+            
+            try {
+                // Simulate AI analysis
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Show success message
+                alert('✅ AI Analysis Complete!\n\nFound 2 potential RAID items:\n• Risk: API performance concerns\n• Issue: Authentication timeout errors\n\nItems have been added to your dashboard.');
+                
+                // Clear text
+                textInput.value = '';
+                updateCharCount(textInput);
+                
+            } catch (error) {
+                alert('❌ Analysis failed. Please try again.');
+            } finally {
+                // Reset button
+                analyzeBtn.disabled = false;
+                analyzeBtn.classList.remove('loading');
+                analyzeBtn.innerHTML = '<span>🔍</span><span>Analyze Text</span>';
+            }
+        }
+
+        // Backend status check
+        async function checkBackendStatus() {
+            try {
+                const response = await fetch('http://localhost:8001/api/health');
+                if (response.ok) {
+                    document.getElementById('backend-status').textContent = 'AI Backend Connected';
+                } else {
+                    throw new Error('Backend not responding');
+                }
+            } catch (error) {
+                document.getElementById('backend-status').textContent = 'Demo Mode (Offline)';
+            }
+        }
+
+        // Theme toggle functionality
+        document.querySelector('.theme-button').addEventListener('click', () => {
+            // Theme switching logic would go here
+            alert('Theme toggle functionality would be implemented here.');
+        });
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', () => {
+            checkBackendStatus();
+            
+            // Add smooth scrolling
+            document.documentElement.style.scrollBehavior = 'smooth';
+            
+            // Add intersection observer for animations
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            // Observe cards
+            document.querySelectorAll('.stat-card, .item-card').forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+</html>
