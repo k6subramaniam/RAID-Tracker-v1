@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
+import { View, ScrollView, StyleSheet, Alert } from 'react-native';
 import { Text, Card, Button, useTheme, ProgressBar, List, Chip } from 'react-native-paper';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { useStore } from '../store';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import { apiService } from '../services/api';
 
 type RoutePropType = RouteProp<RootStackParamList, 'AIAnalysis'>;
 
@@ -14,6 +15,7 @@ const AIAnalysisScreen: React.FC = () => {
   const [analyzing, setAnalyzing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [results, setResults] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   const itemsToAnalyze = route.params?.itemIds
     ? items.filter(item => route.params.itemIds?.includes(item.id))
@@ -22,31 +24,60 @@ const AIAnalysisScreen: React.FC = () => {
   const handleAnalysis = async () => {
     setAnalyzing(true);
     setProgress(0);
-    const analysisResults = [];
-
-    for (let i = 0; i < itemsToAnalyze.length; i++) {
-      const item = itemsToAnalyze[i];
+    setError(null);
+    
+    try {
+      // First check if API is available
+      await apiService.healthCheck();
       
-      // Simulate AI analysis
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const mockAnalysis = {
-        itemId: item.id,
-        itemTitle: item.title,
-        analysis: `Based on the assessment, this ${item.type} has ${item.impact} impact with ${item.likelihood} likelihood.`,
-        suggestedPriority: item.priority,
-        confidence: 0.85 + Math.random() * 0.15,
-        flags: Math.random() > 0.7 ? [
-          { code: 'MISSING_DETAIL', message: 'Description could be more detailed', severity: 'medium' as const }
-        ] : [],
-      };
-      
-      analysisResults.push(mockAnalysis);
-      setProgress((i + 1) / itemsToAnalyze.length);
+      // Use batch analysis for multiple items or single analysis for one item
+      if (itemsToAnalyze.length > 1) {
+        const batchResults = await apiService.batchAnalyze(itemsToAnalyze, 'analysis');
+        setResults(batchResults.map(result => ({
+          itemId: result.itemId,
+          itemTitle: result.itemTitle,
+          analysis: result.analysis.analysis,
+          suggestedPriority: result.analysis.suggestedPriority,
+          suggestedStatus: result.analysis.suggestedStatus,
+          confidence: result.analysis.confidence,
+          flags: result.analysis.flags || [],
+        })));
+      } else {
+        // Single item analysis with progress simulation
+        const analysisResults = [];
+        
+        for (let i = 0; i < itemsToAnalyze.length; i++) {
+          const item = itemsToAnalyze[i];
+          setProgress((i + 0.5) / itemsToAnalyze.length);
+          
+          const analysis = await apiService.analyzeItem(item, 'analysis');
+          
+          analysisResults.push({
+            itemId: item.id,
+            itemTitle: item.title,
+            analysis: analysis.analysis,
+            suggestedPriority: analysis.suggestedPriority,
+            suggestedStatus: analysis.suggestedStatus,
+            confidence: analysis.confidence,
+            flags: analysis.flags || [],
+          });
+          
+          setProgress((i + 1) / itemsToAnalyze.length);
+        }
+        
+        setResults(analysisResults);
+      }
+    } catch (err: any) {
+      console.error('Analysis error:', err);
+      setError(err.message || 'Failed to analyze items');
+      Alert.alert(
+        'Analysis Error', 
+        'Failed to connect to AI service. Please check your connection and try again.',
+        [{ text: 'OK' }]
+      );
+    } finally {
+      setAnalyzing(false);
     }
-
-    setResults(analysisResults);
-    setAnalyzing(false);
   };
 
   const applyAnalysis = (result: any) => {
