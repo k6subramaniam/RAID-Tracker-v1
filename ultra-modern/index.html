@@ -1484,9 +1484,88 @@
                             <!-- Results will be displayed here -->
                         </div>
                     </div>
+                <!-- Other Pages -->
+                <div id="new-item-page" class="page-content hidden">
+                    <div class="section-header">
+                        <h2 class="section-title">Create New RAID Item</h2>
+                        <p class="section-subtitle">Guided multi-step creation with AI-powered validation</p>
+                    </div>
+                    <p style="color: var(--text-secondary); text-align: center; padding: 40px;">
+                        Multi-step guided creation form will be implemented here with real-time AI validation and suggestions.
+                    </p>
+                </div>
+
+                <div id="governance-page" class="page-content hidden">
+                    <div class="section-header">
+                        <h2 class="section-title">Governance Guide</h2>
+                        <p class="section-subtitle">Policies, procedures, and compliance guidelines</p>
+                    </div>
+                    <p style="color: var(--text-secondary); text-align: center; padding: 40px;">
+                        Comprehensive governance framework, SLA requirements, and escalation procedures will be available here.
+                    </p>
+                </div>
+
+                <div id="reports-page" class="page-content hidden">
+                    <div class="section-header">
+                        <h2 class="section-title">Analytics & Reports</h2>
+                        <p class="section-subtitle">Executive dashboards and data insights</p>
+                    </div>
+                    <p style="color: var(--text-secondary); text-align: center; padding: 40px;">
+                        Advanced analytics, trend analysis, and executive reporting dashboard with AI-generated summaries.
+                    </p>
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- Add Provider Modal -->
+    <div id="add-provider-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add New AI Provider</h3>
+                <button class="close-btn" onclick="closeAddProviderModal()">&times;</button>
+            </div>
+            
+            <form id="add-provider-form">
+                <div class="form-group">
+                    <label class="form-label">Provider Name</label>
+                    <input type="text" class="form-input" id="new-provider-name" placeholder="e.g., OpenAI GPT-5 Production" required>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label class="form-label">Provider Type</label>
+                        <select class="form-input" id="new-provider-type" onchange="updateNewProviderModels()" required>
+                            <option value="">Select Provider</option>
+                            <option value="openai">OpenAI</option>
+                            <option value="anthropic">Anthropic (Claude)</option>
+                            <option value="gemini">Google Gemini</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Model</label>
+                        <select class="form-input" id="new-provider-model" required>
+                            <option value="">Select Model</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">API Key</label>
+                    <input type="password" class="form-input" id="new-provider-key" placeholder="Enter your API key" required>
+                </div>
+                
+                <div style="display: flex; gap: 12px; margin-top: 24px;">
+                    <button type="submit" class="btn btn-primary">
+                        <span>➕</span>
+                        <span>Add Provider</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="closeAddProviderModal()">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Hidden file input -->
