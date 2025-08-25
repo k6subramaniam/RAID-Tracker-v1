@@ -118,7 +118,7 @@ const MainTabs: React.FC = () => {
         options={{
           title: 'Reports',
           tabBarIcon: ({ color, size }) => (
-            <Icon name="chart-bar" size={size} color={color} />
+            <WebIcon name="chart-bar" size={size} color={color} />
           ),
         }}
       />
