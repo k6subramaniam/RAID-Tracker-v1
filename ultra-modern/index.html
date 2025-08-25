@@ -1123,25 +1123,70 @@
                     </div>
                 </div>
 
-                <!-- Other pages would go here -->
-                <div id="new-item-page" class="page-content hidden">
-                    <h2>Create New RAID Item</h2>
-                    <p>Multi-step guided creation form would be here...</p>
-                </div>
-
-                <div id="governance-page" class="page-content hidden">
-                    <h2>Governance Guide</h2>
-                    <p>Governance policies and procedures would be here...</p>
-                </div>
-
-                <div id="reports-page" class="page-content hidden">
-                    <h2>Reports</h2>
-                    <p>Analytics and reporting dashboard would be here...</p>
-                </div>
-
+                <!-- AI Configuration Page -->
                 <div id="ai-config-page" class="page-content hidden">
-                    <h2>AI Configuration</h2>
-                    <p>AI settings and configuration options would be here...</p>
+                    <div class="section-header">
+                        <h2 class="section-title">AI Configuration Center</h2>
+                        <p class="section-subtitle">Manage multiple AI providers with real-time validation for enhanced RAID analysis</p>
+                    </div>
+
+                    <!-- AI Providers Grid -->
+                    <div class="providers-grid" id="ai-providers-grid">
+                        <!-- Providers will be loaded here -->
+                    </div>
+
+                    <!-- Add Provider Section -->
+                    <div class="add-provider-section" style="margin-top: 32px;">
+                        <button class="btn btn-primary" onclick="openAddProviderModal()" style="padding: 12px 24px;">
+                            <span>➕</span>
+                            <span>Add New AI Provider</span>
+                        </button>
+                        <button class="btn btn-secondary" onclick="validateAllProviders()" style="padding: 12px 24px;">
+                            <span>⚡</span>
+                            <span>Test All Providers</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- AI Analysis Hub Page -->
+                <div id="ai-analysis-page" class="page-content hidden">
+                    <div class="section-header">
+                        <h2 class="section-title">AI Analysis Hub</h2>
+                        <p class="section-subtitle">Advanced AI analysis with multi-provider comparison and consensus scoring</p>
+                    </div>
+
+                    <!-- Multi-Provider Analysis Section -->
+                    <div class="multi-analysis-section">
+                        <div class="analysis-controls">
+                            <h3>🔍 Multi-Provider RAID Analysis</h3>
+                            <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                                Select a RAID item below and analyze it using multiple AI providers simultaneously for enhanced accuracy and consensus scoring.
+                            </p>
+                            
+                            <div class="raid-item-selector">
+                                <select id="analysis-item-select" class="form-select" style="margin-bottom: 16px;">
+                                    <option value="">Select a RAID item to analyze</option>
+                                </select>
+                                
+                                <div class="provider-selection">
+                                    <h4 style="margin-bottom: 12px;">Select Providers for Analysis:</h4>
+                                    <div id="provider-checkboxes" class="provider-checkboxes">
+                                        <!-- Provider checkboxes will be loaded here -->
+                                    </div>
+                                </div>
+                                
+                                <button class="btn btn-primary" onclick="runMultiProviderAnalysis()" id="multi-analysis-btn" style="margin-top: 16px;">
+                                    <span>🧠</span>
+                                    <span>Run Multi-Provider Analysis</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Analysis Results -->
+                        <div id="multi-analysis-results" class="analysis-results" style="margin-top: 32px; display: none;">
+                            <!-- Results will be displayed here -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
