@@ -1423,96 +1423,444 @@
                 <!-- AI Configuration Page -->
                 <div id="ai-config-page" class="page-content hidden">
                     <div class="section-header">
-                        <h2 class="section-title">AI Configuration Center</h2>
-                        <p class="section-subtitle">Manage multiple AI providers with real-time validation for enhanced RAID analysis</p>
+                        <h2 class="section-title">AI Configuration</h2>
+                        <p class="section-subtitle">Manage and test your AI model connections and settings.</p>
                     </div>
 
-                    <!-- AI Providers Grid -->
-                    <div class="providers-grid" id="ai-providers-grid">
-                        <!-- Providers will be loaded here -->
+                    <!-- Processing Mode Section -->
+                    <div class="config-section">
+                        <h3 class="config-section-title">Processing Mode</h3>
+                        <p class="config-section-subtitle">Choose between local on-device processing or cloud-based AI models.</p>
+                        
+                        <div class="mode-toggle-container">
+                            <div class="mode-toggle">
+                                <button class="mode-btn" id="local-ai-btn" onclick="setProcessingMode('local')">Local AI</button>
+                                <button class="mode-btn active" id="cloud-ai-btn" onclick="setProcessingMode('cloud')">Cloud AI</button>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Add Provider Section -->
-                    <div class="add-provider-section" style="margin-top: 32px;">
-                        <button class="btn btn-primary" onclick="openAddProviderModal()" style="padding: 12px 24px;">
-                            <span>➕</span>
-                            <span>Add New AI Provider</span>
-                        </button>
-                        <button class="btn btn-secondary" onclick="validateAllProviders()" style="padding: 12px 24px;">
-                            <span>⚡</span>
-                            <span>Test All Providers</span>
-                        </button>
+                    <!-- Cloud AI Provider Section -->
+                    <div class="config-section" id="cloud-ai-section">
+                        <h3 class="config-section-title">Cloud AI Provider</h3>
+                        <p class="config-section-subtitle">Your API key is stored securely in your browser's local storage.</p>
+                        
+                        <div class="provider-config-grid">
+                            <div class="form-group">
+                                <label class="form-label">API Provider</label>
+                                <select class="form-input" id="ai-provider-dropdown" onchange="updateProviderModels()">
+                                    <option value="openai">OpenAI (GPT)</option>
+                                    <option value="anthropic">Anthropic (Claude)</option>
+                                    <option value="gemini" selected>Google AI (Gemini)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">API Key</label>
+                                <div class="api-key-container">
+                                    <input type="password" class="form-input api-key-input" id="api-key-input" placeholder="Enter your API key">
+                                    <button class="test-btn" onclick="testApiKey()">Test</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Model Selection Section -->
+                    <div class="config-section">
+                        <h3 class="config-section-title">Model Selection</h3>
+                        <p class="config-section-subtitle">Select the active model for the chosen provider.</p>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Active Model</label>
+                            <select class="form-input" id="active-model-select">
+                                <option value="gemini-1.5-flash-latest">gemini-1.5-flash-latest</option>
+                                <option value="gemini-1.5-pro-latest">gemini-1.5-pro-latest</option>
+                                <option value="gemini-2.0-flash">gemini-2.0-flash</option>
+                                <option value="gemini-2.5-pro">gemini-2.5-pro</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- RAID-Specific Intelligence Section -->
+                    <div class="config-section">
+                        <h3 class="config-section-title">RAID-Specific Intelligence</h3>
+                        <p class="config-section-subtitle">Configure how AI assists with RAID item management.</p>
+                        
+                        <div class="intelligence-toggles">
+                            <div class="toggle-item">
+                                <div class="toggle-content">
+                                    <h4>Auto-suggest Priority Level</h4>
+                                </div>
+                                <div class="toggle-switch active" onclick="toggleFeature(this, 'priority')">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="toggle-item">
+                                <div class="toggle-content">
+                                    <h4>Auto-suggest Owner</h4>
+                                </div>
+                                <div class="toggle-switch" onclick="toggleFeature(this, 'owner')">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="toggle-item">
+                                <div class="toggle-content">
+                                    <h4>Auto-suggest Response Strategy</h4>
+                                </div>
+                                <div class="toggle-switch active" onclick="toggleFeature(this, 'strategy')">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="toggle-item">
+                                <div class="toggle-content">
+                                    <h4>Use Historical Data for Analysis</h4>
+                                </div>
+                                <div class="toggle-switch active" onclick="toggleFeature(this, 'historical')">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- AI Analysis Hub Page -->
-                <div id="ai-analysis-page" class="page-content hidden">
+                <!-- Program Governance Page -->
+                <div id="governance-page" class="page-content hidden">
                     <div class="section-header">
-                        <h2 class="section-title">AI Analysis Hub</h2>
-                        <p class="section-subtitle">Advanced AI analysis with multi-provider comparison and consensus scoring</p>
+                        <h2 class="section-title">Program Governance</h2>
+                        <p class="section-subtitle">Official RAID standards, escalation paths, and compliance requirements for the State Modernization program.</p>
                     </div>
 
-                    <!-- Multi-Provider Analysis Section -->
-                    <div class="multi-analysis-section">
-                        <div class="analysis-controls">
-                            <h3>🔍 Multi-Provider RAID Analysis</h3>
-                            <p style="color: var(--text-secondary); margin-bottom: 20px;">
-                                Select a RAID item below and analyze it using multiple AI providers simultaneously for enhanced accuracy and consensus scoring.
-                            </p>
+                    <!-- Governance Navigation -->
+                    <div class="governance-nav">
+                        <button class="gov-nav-btn active" onclick="showGovernanceSection('guide')">RAID Guide</button>
+                        <button class="gov-nav-btn" onclick="showGovernanceSection('escalation')">Escalation Path</button>
+                        <button class="gov-nav-btn" onclick="showGovernanceSection('committees')">Committees</button>
+                    </div>
+
+                    <!-- RAID Guide Section -->
+                    <div id="gov-guide-section" class="governance-content">
+                        <div class="priority-levels">
+                            <!-- Low Priority -->
+                            <div class="priority-card low">
+                                <div class="priority-header">
+                                    <h3>Low</h3>
+                                    <span class="priority-label">RAID Priority Level</span>
+                                </div>
+                                <div class="priority-details">
+                                    <div class="detail-item">
+                                        <strong>Decision Authority:</strong><br>
+                                        Workstream/Functional Lead
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Response Timeline:</strong><br>
+                                        5 business days
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Escalation Path:</strong><br>
+                                        Functional Lead → Program Delivery Lead → Communication
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Communication:</strong><br>
+                                        Email to Program Director. Weekly status meetings.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Medium-Low Priority -->
+                            <div class="priority-card medium-low">
+                                <div class="priority-header">
+                                    <h3>Medium-Low</h3>
+                                    <span class="priority-label">RAID Priority Level</span>
+                                </div>
+                                <div class="priority-details">
+                                    <div class="detail-item">
+                                        <strong>Decision Authority:</strong><br>
+                                        Workstream/Functional Lead
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Response Timeline:</strong><br>
+                                        3 business days
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Escalation Path:</strong><br>
+                                        Functional Lead → Program Delivery Lead → Communication
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Communication:</strong><br>
+                                        Immediate notification to Program Director
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Medium-High Priority -->
+                            <div class="priority-card medium-high">
+                                <div class="priority-header">
+                                    <h3>Medium-High</h3>
+                                    <span class="priority-label">RAID Priority Level</span>
+                                </div>
+                                <div class="priority-details">
+                                    <div class="detail-item">
+                                        <strong>Decision Authority:</strong><br>
+                                        Program Director/Acting Lead
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Response Timeline:</strong><br>
+                                        2 business days
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Escalation Path:</strong><br>
+                                        Program Delivery Lead → Program Director → Communication
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Communication:</strong><br>
+                                        Immediate notification to Program Director
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- High Priority -->
+                            <div class="priority-card high">
+                                <div class="priority-header">
+                                    <h3>High</h3>
+                                    <span class="priority-label">RAID Priority 15-20</span>
+                                </div>
+                                <div class="priority-details">
+                                    <div class="detail-item">
+                                        <strong>Decision Authority:</strong><br>
+                                        Program Director/Acting Lead
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Response Timeline:</strong><br>
+                                        1 business day
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Escalation Path:</strong><br>
+                                        Program Director → Steering Committee Director → Communication
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Communication:</strong><br>
+                                        Immediate notification to Program Director
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Critical Priority -->
+                            <div class="priority-card critical">
+                                <div class="priority-header">
+                                    <h3>Critical</h3>
+                                    <span class="priority-label">RAID Priority 20-25</span>
+                                </div>
+                                <div class="priority-details">
+                                    <div class="detail-item">
+                                        <strong>Decision Authority:</strong><br>
+                                        Program Steering Committee
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Response Timeline:</strong><br>
+                                        Same day/Immediate
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Escalation Path:</strong><br>
+                                        Program Director → Steering Committee → Communication
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Communication:</strong><br>
+                                        Immediate notification to Program Director and Steering Committee members.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Escalation Path Section -->
+                    <div id="gov-escalation-section" class="governance-content hidden">
+                        <div class="escalation-flow">
+                            <h3>Escalation Process Flow</h3>
+                            <div class="flow-diagram">
+                                <div class="flow-step">
+                                    <div class="step-number">1</div>
+                                    <div class="step-content">
+                                        <h4>Workstream Lead</h4>
+                                        <p>Initial assessment and attempted resolution</p>
+                                    </div>
+                                </div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">
+                                    <div class="step-number">2</div>
+                                    <div class="step-content">
+                                        <h4>Functional Lead</h4>
+                                        <p>Resource allocation and cross-functional coordination</p>
+                                    </div>
+                                </div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">
+                                    <div class="step-number">3</div>
+                                    <div class="step-content">
+                                        <h4>Program Director</h4>
+                                        <p>Strategic decisions and stakeholder engagement</p>
+                                    </div>
+                                </div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">
+                                    <div class="step-number">4</div>
+                                    <div class="step-content">
+                                        <h4>Steering Committee</h4>
+                                        <p>Executive oversight and final resolution</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Committees Section -->
+                    <div id="gov-committees-section" class="governance-content hidden">
+                        <div class="committees-grid">
+                            <div class="committee-card">
+                                <h3>Program Steering Committee</h3>
+                                <p><strong>Purpose:</strong> Executive oversight and strategic direction</p>
+                                <p><strong>Meeting Frequency:</strong> Monthly</p>
+                                <p><strong>Escalation Authority:</strong> Critical items (Priority 20-25)</p>
+                            </div>
+                            <div class="committee-card">
+                                <h3>Program Delivery Committee</h3>
+                                <p><strong>Purpose:</strong> Operational coordination and delivery oversight</p>
+                                <p><strong>Meeting Frequency:</strong> Weekly</p>
+                                <p><strong>Escalation Authority:</strong> High items (Priority 15-20)</p>
+                            </div>
+                            <div class="committee-card">
+                                <h3>Technical Review Board</h3>
+                                <p><strong>Purpose:</strong> Technical architecture and standards</p>
+                                <p><strong>Meeting Frequency:</strong> Bi-weekly</p>
+                                <p><strong>Escalation Authority:</strong> Technical dependencies and risks</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Download Reports Page -->
+                <div id="reports-page" class="page-content hidden">
+                    <div class="section-header">
+                        <h2 class="section-title">Download Reports</h2>
+                        <p class="section-subtitle">Export your RAID items to PDF or CSV for sharing and analysis.</p>
+                    </div>
+
+                    <div class="export-container">
+                        <div class="export-section">
+                            <h3 class="export-title">Export Options</h3>
+                            <p class="export-subtitle">Select a format and download your report.</p>
                             
-                            <div class="raid-item-selector">
-                                <select id="analysis-item-select" class="form-select" style="margin-bottom: 16px;">
-                                    <option value="">Select a RAID item to analyze</option>
+                            <div class="export-format-selector">
+                                <select class="form-input export-select" id="export-format">
+                                    <option value="pdf">📄 PDF Document</option>
+                                    <option value="csv">📊 CSV Spreadsheet</option>
+                                    <option value="xlsx">📗 Excel Workbook</option>
+                                    <option value="json">🔧 JSON Data</option>
                                 </select>
-                                
-                                <div class="provider-selection">
-                                    <h4 style="margin-bottom: 12px;">Select Providers for Analysis:</h4>
-                                    <div id="provider-checkboxes" class="provider-checkboxes">
-                                        <!-- Provider checkboxes will be loaded here -->
+                            </div>
+                            
+                            <div class="export-options" id="export-options">
+                                <!-- PDF Options -->
+                                <div class="format-options" id="pdf-options">
+                                    <div class="option-group">
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" checked> Include Executive Summary
+                                        </label>
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" checked> Include Priority Matrix
+                                        </label>
+                                        <label class="checkbox-label">
+                                            <input type="checkbox"> Include AI Analysis Notes
+                                        </label>
+                                        <label class="checkbox-label">
+                                            <input type="checkbox"> Include Historical Data
+                                        </label>
                                     </div>
                                 </div>
                                 
-                                <button class="btn btn-primary" onclick="runMultiProviderAnalysis()" id="multi-analysis-btn" style="margin-top: 16px;">
-                                    <span>🧠</span>
-                                    <span>Run Multi-Provider Analysis</span>
-                                </button>
+                                <!-- CSV Options -->
+                                <div class="format-options hidden" id="csv-options">
+                                    <div class="option-group">
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" checked> Include All Fields
+                                        </label>
+                                        <label class="checkbox-label">
+                                            <input type="checkbox"> Include Timestamps
+                                        </label>
+                                        <label class="checkbox-label">
+                                            <input type="checkbox"> Include Calculated Scores
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
+                            
+                            <button class="download-btn" onclick="downloadReport()">
+                                <span class="download-icon">⬇</span>
+                                <span>Download</span>
+                            </button>
                         </div>
                         
-                        <!-- Analysis Results -->
-                        <div id="multi-analysis-results" class="analysis-results" style="margin-top: 32px; display: none;">
-                            <!-- Results will be displayed here -->
+                        <!-- Report Preview -->
+                        <div class="report-preview">
+                            <h3>Report Preview</h3>
+                            <div class="preview-content">
+                                <div class="preview-header">
+                                    <h4>RAID Management Report</h4>
+                                    <p>Generated: <span id="report-date"></span></p>
+                                </div>
+                                
+                                <div class="preview-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-number">4</span>
+                                        <span class="stat-label">Total Items</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-number">1</span>
+                                        <span class="stat-label">Critical</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-number">2</span>
+                                        <span class="stat-label">In Progress</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="preview-table">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Type</th>
+                                                <th>Title</th>
+                                                <th>Priority</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Risk</td>
+                                                <td>API Rate Limiting</td>
+                                                <td>P1</td>
+                                                <td>Open</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Issue</td>
+                                                <td>Auth Service Down</td>
+                                                <td>P0</td>
+                                                <td>In Progress</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Assumption</td>
+                                                <td>User Adoption Rate</td>
+                                                <td>P3</td>
+                                                <td>Proposed</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                <!-- Other Pages -->
-                <div id="new-item-page" class="page-content hidden">
-                    <div class="section-header">
-                        <h2 class="section-title">Create New RAID Item</h2>
-                        <p class="section-subtitle">Guided multi-step creation with AI-powered validation</p>
-                    </div>
-                    <p style="color: var(--text-secondary); text-align: center; padding: 40px;">
-                        Multi-step guided creation form will be implemented here with real-time AI validation and suggestions.
-                    </p>
-                </div>
-
-                <div id="governance-page" class="page-content hidden">
-                    <div class="section-header">
-                        <h2 class="section-title">Governance Guide</h2>
-                        <p class="section-subtitle">Policies, procedures, and compliance guidelines</p>
-                    </div>
-                    <p style="color: var(--text-secondary); text-align: center; padding: 40px;">
-                        Comprehensive governance framework, SLA requirements, and escalation procedures will be available here.
-                    </p>
-                </div>
-
-                <div id="reports-page" class="page-content hidden">
-                    <div class="section-header">
-                        <h2 class="section-title">Analytics & Reports</h2>
-                        <p class="section-subtitle">Executive dashboards and data insights</p>
-                    </div>
-                    <p style="color: var(--text-secondary); text-align: center; padding: 40px;">
-                        Advanced analytics, trend analysis, and executive reporting dashboard with AI-generated summaries.
-                    </p>
                 </div>
             </div>
         </main>
