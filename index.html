@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAIDMASTER - Ultra Modern Interface Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1f1f23 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #fb923c, #f97316);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        h1 {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fb923c, #f97316);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+        }
+        
+        .subtitle {
+            font-size: 20px;
+            color: #a1a1aa;
+            margin-bottom: 8px;
+        }
+        
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 20px;
+            font-size: 14px;
+            color: #10b981;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 32px;
+            margin-top: 40px;
+        }
+        
+        .preview-card {
+            background: rgba(38, 38, 41, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 32px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .preview-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #fb923c, #f97316);
+        }
+        
+        .preview-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(251, 146, 60, 0.5);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #fb923c, #f97316);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 24px;
+        }
+        
+        .card-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #ffffff;
+        }
+        
+        .card-description {
+            font-size: 16px;
+            color: #a1a1aa;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .card-features {
+            list-style: none;
+            margin-bottom: 24px;
+        }
+        
+        .card-features li {
+            font-size: 14px;
+            color: #71717a;
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .card-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .preview-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #fb923c, #f97316);
+            color: #18181b;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .preview-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(251, 146, 60, 0.3);
+        }
+        
+        .backend-status {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 40px;
+            text-align: center;
+        }
+        
+        .backend-status h3 {
+            color: #10b981;
+            margin-bottom: 12px;
+        }
+        
+        .backend-status p {
+            color: #a1a1aa;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">⚡</div>
+                <h1>RAIDMaster</h1>
+            </div>
+            <div class="subtitle">Ultra-Modern AI-Enhanced Risk Management</div>
+            <div class="status">
+                <div class="status-dot"></div>
+                <span>Ultra-Modern Interface Ready</span>
+            </div>
+        </div>
+        
+        <div class="preview-grid">
+            <a href="/ultra-modern/index.html" class="preview-card">
+                <div class="card-icon">🏠</div>
+                <div class="card-title">Main Dashboard</div>
+                <div class="card-description">
+                    Experience the redesigned RAIDMASTER interface with modern dark theme, AI-powered analysis, and intuitive navigation.
+                </div>
+                <ul class="card-features">
+                    <li>Dashboard with real-time statistics</li>
+                    <li>AI-powered RAID analysis interface</li>
+                    <li>Modern sidebar navigation</li>
+                    <li>File upload and text analysis</li>
+                    <li>Multi-provider AI selection</li>
+                </ul>
+                <div class="preview-button">
+                    <span>View Dashboard</span>
+                    <span>→</span>
+                </div>
+            </a>
+            
+            <a href="/ultra-modern/ai-config.html" class="preview-card">
+                <div class="card-icon">🤖</div>
+                <div class="card-title">AI Configuration Center</div>
+                <div class="card-description">
+                    Manage multiple AI providers with real-time validation for enhanced RAID analysis capabilities.
+                </div>
+                <ul class="card-features">
+                    <li>Multi-provider AI management</li>
+                    <li>Real-time API key validation</li>
+                    <li>OpenAI, Claude, and Gemini support</li>
+                    <li>Batch provider testing</li>
+                    <li>Provider status monitoring</li>
+                </ul>
+                <div class="preview-button">
+                    <span>Configure AI</span>
+                    <span>→</span>
+                </div>
+            </a>
+        </div>
+        
+        <div class="backend-status">
+            <h3>🚀 Backend API Status</h3>
+            <p>FastAPI backend is running at <strong>localhost:8001/api</strong> with full AI provider management support</p>
+        </div>
+    </div>
+</body>
+</html>
