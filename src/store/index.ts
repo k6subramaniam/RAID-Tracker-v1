@@ -13,7 +13,8 @@ import {
 import { 
   DEFAULT_WORKSTREAMS, 
   DEFAULT_OWNERS, 
-  DEFAULT_AI_CONFIG 
+  DEFAULT_AI_CONFIG,
+  SAMPLE_RAID_ITEMS 
 } from '../constants';
 import { generateId } from '../utils/helpers';
 
