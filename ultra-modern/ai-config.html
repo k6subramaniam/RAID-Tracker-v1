@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAIDMaster - AI Configuration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Dark Theme Color System */
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #161618;
+            --bg-tertiary: #1f1f23;
+            --bg-card: #262629;
+            --bg-hover: #2a2a2e;
+            
+            /* Text Colors */
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --text-inverse: #18181b;
+            
+            /* Accent Colors */
+            --accent-orange: #fb923c;
+            --accent-orange-hover: #f97316;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-purple: #8b5cf6;
+            --accent-red: #ef4444;
+            --accent-yellow: #eab308;
+            
+            /* Status Colors */
+            --status-active: #10b981;
+            --status-inactive: #6b7280;
+            --status-error: #ef4444;
+            --status-warning: #f59e0b;
+            --status-validating: #3b82f6;
+            
+            /* Border Colors */
+            --border-primary: #27272a;
+            --border-secondary: #3f3f46;
+            --border-hover: #52525b;
+            --border-success: #10b981;
+            --border-error: #ef4444;
+            
+            /* Shadows & Effects */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.5);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-orange), var(--accent-purple), var(--accent-blue));
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .header-text h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header-text p {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        .header-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Provider Cards */
+        .providers-section {
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .providers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 24px;
+        }
+
+        .provider-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .provider-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .provider-card.active::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--status-active);
+        }
+
+        .provider-card.error::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--status-error);
+        }
+
+        .provider-card.validating::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--status-validating);
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .provider-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .provider-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .provider-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .provider-icon.openai {
+            background: linear-gradient(135deg, #00d4aa, #00a67e);
+            color: white;
+        }
+
+        .provider-icon.anthropic {
+            background: linear-gradient(135deg, #d97706, #f59e0b);
+            color: white;
+        }
+
+        .provider-icon.gemini {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+        }
+
+        .provider-details h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .provider-model {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .provider-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-dot.active { background: var(--status-active); }
+        .status-dot.inactive { background: var(--status-inactive); }
+        .status-dot.error { background: var(--status-error); }
+        .status-dot.validating { 
+            background: var(--status-validating); 
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+
+        .provider-form {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            flex: 1;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--accent-orange);
+            box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.1);
+        }
+
+        .form-input.error {
+            border-color: var(--status-error);
+        }
+
+        .form-input.success {
+            border-color: var(--status-active);
+        }
+
+        .api-key-group {
+            position: relative;
+        }
+
+        .api-key-input {
+            padding-right: 48px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .toggle-visibility {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px;
+        }
+
+        .toggle-visibility:hover {
+            color: var(--text-primary);
+        }
+
+        .validation-info {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 16px;
+            font-size: 12px;
+        }
+
+        .validation-info.success {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--status-active);
+            color: var(--status-active);
+        }
+
+        .validation-info.error {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: var(--status-error);
+            color: var(--status-error);
+        }
+
+        .validation-info.validating {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: var(--status-validating);
+            color: var(--status-validating);
+        }
+
+        .provider-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            font-weight: 500;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--accent-orange);
+            color: var(--text-inverse);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-orange-hover);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-secondary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+        }
+
+        .btn-danger {
+            background: var(--status-error);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-loading {
+            position: relative;
+            pointer-events: none;
+        }
+
+        .btn-loading::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            margin: auto;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Add Provider Section */
+        .add-provider-card {
+            background: var(--bg-secondary);
+            border: 2px dashed var(--border-secondary);
+            border-radius: 16px;
+            padding: 32px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .add-provider-card:hover {
+            border-color: var(--accent-orange);
+            background: var(--bg-tertiary);
+        }
+
+        .add-provider-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 20px;
+            color: var(--accent-orange);
+        }
+
+        .add-provider-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .add-provider-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* Testing Section */
+        .testing-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 32px;
+        }
+
+        .test-all-btn {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .test-all-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 24px;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .close-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .providers-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .header-actions {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <div class="header-icon">🤖</div>
+                <div class="header-text">
+                    <h1>AI Configuration Center</h1>
+                    <p>Manage multiple AI providers with real-time validation for enhanced RAID analysis</p>
+                </div>
+                <div class="header-actions">
+                    <button class="test-all-btn" onclick="validateAllProviders()">
+                        <span>⚡</span>
+                        <span>Test All Providers</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Providers Section -->
+        <div class="providers-section">
+            <h2 class="section-title">
+                <span>🔧</span>
+                <span>AI Providers</span>
+                <span id="provider-count" style="font-size: 14px; color: var(--text-secondary); font-weight: 400;">(Loading...)</span>
+            </h2>
+            
+            <div class="providers-grid" id="providers-grid">
+                <!-- Providers will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Testing Section -->
+        <div class="testing-section">
+            <h3 style="margin-bottom: 16px;">🧪 Batch Testing & Validation</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                Validate all providers simultaneously to ensure your AI analysis pipeline is ready for production use.
+            </p>
+            
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <button class="btn btn-secondary" onclick="loadAvailableModels()">
+                    <span>📋</span>
+                    <span>View Available Models</span>
+                </button>
+                <button class="btn btn-secondary" onclick="exportConfiguration()">
+                    <span>💾</span>
+                    <span>Export Config</span>
+                </button>
+                <button class="btn btn-secondary" onclick="importConfiguration()">
+                    <span>📥</span>
+                    <span>Import Config</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Provider Modal -->
+    <div id="add-provider-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add New AI Provider</h3>
+                <button class="close-btn" onclick="closeAddProviderModal()">&times;</button>
+            </div>
+            
+            <form id="add-provider-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Provider Name</label>
+                        <input type="text" class="form-input" id="new-provider-name" placeholder="e.g., OpenAI GPT-5 Production" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Provider Type</label>
+                        <select class="form-select" id="new-provider-type" onchange="updateModelOptions()" required>
+                            <option value="">Select Provider</option>
+                            <option value="openai">OpenAI</option>
+                            <option value="anthropic">Anthropic (Claude)</option>
+                            <option value="gemini">Google Gemini</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Model</label>
+                        <select class="form-select" id="new-provider-model" required>
+                            <option value="">Select Model</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">API Key</label>
+                    <div class="api-key-group">
+                        <input type="password" class="form-input api-key-input" id="new-provider-key" placeholder="Enter your API key" required>
+                        <button type="button" class="toggle-visibility" onclick="toggleKeyVisibility('new-provider-key')">👁️</button>
+                    </div>
+                </div>
+                
+                <div class="provider-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <span>➕</span>
+                        <span>Add Provider</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="closeAddProviderModal()">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Models Modal -->
+    <div id="models-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Available Models</h3>
+                <button class="close-btn" onclick="closeModelsModal()">&times;</button>
+            </div>
+            <div id="models-content">
+                Loading available models...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8001/api';
+        
+        // Available models for each provider
+        const PROVIDER_MODELS = {
+            openai: [
+                { value: 'gpt-5', label: 'GPT-5 (Latest)' },
+                { value: 'gpt-5-mini', label: 'GPT-5 Mini' },
+                { value: 'gpt-4o', label: 'GPT-4o' },
+                { value: 'gpt-4o-mini', label: 'GPT-4o Mini' },
+                { value: 'gpt-4', label: 'GPT-4' },
+                { value: 'o1', label: 'o1' },
+                { value: 'o1-mini', label: 'o1 Mini' },
+                { value: 'o3', label: 'o3' },
+                { value: 'o3-mini', label: 'o3 Mini' }
+            ],
+            anthropic: [
+                { value: 'claude-4-opus-20250514', label: 'Claude 4 Opus (Latest)' },
+                { value: 'claude-4-sonnet-20250514', label: 'Claude 4 Sonnet' },
+                { value: 'claude-3-7-sonnet-20250219', label: 'Claude 3.7 Sonnet' },
+                { value: 'claude-3-5-sonnet-20241022', label: 'Claude 3.5 Sonnet' },
+                { value: 'claude-3-5-haiku-20241022', label: 'Claude 3.5 Haiku' }
+            ],
+            gemini: [
+                { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro (Latest)' },
+                { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash' },
+                { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash' },
+                { value: 'gemini-2.0-flash-lite', label: 'Gemini 2.0 Flash Lite' },
+                { value: 'gemini-1.5-pro', label: 'Gemini 1.5 Pro' },
+                { value: 'gemini-1.5-flash', label: 'Gemini 1.5 Flash' }
+            ]
+        };
+
+        // State
+        let providers = [];
+        let validationInProgress = new Set();
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProviders();
+            
+            // Add provider form handler
+            document.getElementById('add-provider-form').addEventListener('submit', handleAddProvider);
+        });
+
+        // Load providers from API
+        async function loadProviders() {
+            try {
+                const response = await fetch(`${API_BASE}/ai/providers`);
+                const data = await response.json();
+                providers = data.providers || [];
+                renderProviders();
+                updateProviderCount();
+            } catch (error) {
+                console.error('Failed to load providers:', error);
+                renderEmptyState();
+            }
+        }
+
+        // Render providers
+        function renderProviders() {
+            const grid = document.getElementById('providers-grid');
+            
+            if (providers.length === 0) {
+                renderEmptyState();
+                return;
+            }
+
+            grid.innerHTML = providers.map(provider => `
+                <div class="provider-card ${getProviderStatusClass(provider.status)}" data-id="${provider.id}">
+                    <div class="provider-header">
+                        <div class="provider-info">
+                            <div class="provider-icon ${provider.provider}">
+                                ${getProviderIcon(provider.provider)}
+                            </div>
+                            <div class="provider-details">
+                                <h3>${provider.name}</h3>
+                                <div class="provider-model">${provider.model}</div>
+                            </div>
+                        </div>
+                        <div class="provider-status">
+                            <div class="status-dot ${provider.status}"></div>
+                            <span>${getStatusText(provider.status)}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="provider-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Provider</label>
+                                <select class="form-select" onchange="updateProvider('${provider.id}', 'provider', this.value)">
+                                    <option value="openai" ${provider.provider === 'openai' ? 'selected' : ''}>OpenAI</option>
+                                    <option value="anthropic" ${provider.provider === 'anthropic' ? 'selected' : ''}>Anthropic</option>
+                                    <option value="gemini" ${provider.provider === 'gemini' ? 'selected' : ''}>Google Gemini</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Model</label>
+                                <select class="form-select" onchange="updateProvider('${provider.id}', 'model', this.value)">
+                                    ${getModelOptions(provider.provider, provider.model)}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">API Key</label>
+                            <div class="api-key-group">
+                                <input type="password" 
+                                       class="form-input api-key-input ${getKeyStatusClass(provider.status)}" 
+                                       value="${provider.api_key_masked}" 
+                                       placeholder="Enter API key"
+                                       onchange="updateProvider('${provider.id}', 'api_key', this.value)">
+                                <button type="button" class="toggle-visibility" onclick="toggleKeyVisibility(this)">👁️</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${renderValidationInfo(provider)}
+                    
+                    <div class="provider-actions">
+                        <button class="btn btn-primary ${validationInProgress.has(provider.id) ? 'btn-loading' : ''}" 
+                                onclick="validateProvider('${provider.id}')"
+                                ${validationInProgress.has(provider.id) ? 'disabled' : ''}>
+                            <span>🔍</span>
+                            <span>${validationInProgress.has(provider.id) ? 'Validating...' : 'Validate'}</span>
+                        </button>
+                        <button class="btn btn-secondary" onclick="toggleProvider('${provider.id}', ${provider.enabled})">
+                            <span>${provider.enabled ? '⏸️' : '▶️'}</span>
+                            <span>${provider.enabled ? 'Disable' : 'Enable'}</span>
+                        </button>
+                        <button class="btn btn-danger" onclick="deleteProvider('${provider.id}')">
+                            <span>🗑️</span>
+                            <span>Delete</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('') + `
+                <div class="add-provider-card" onclick="openAddProviderModal()">
+                    <div class="add-provider-icon">➕</div>
+                    <div class="add-provider-title">Add New Provider</div>
+                    <div class="add-provider-subtitle">Configure additional AI models for enhanced analysis</div>
+                </div>
+            `;
+        }
+
+        function renderEmptyState() {
+            const grid = document.getElementById('providers-grid');
+            grid.innerHTML = `
+                <div class="add-provider-card" onclick="openAddProviderModal()" style="grid-column: 1 / -1;">
+                    <div class="add-provider-icon">🤖</div>
+                    <div class="add-provider-title">No AI Providers Configured</div>
+                    <div class="add-provider-subtitle">Add your first AI provider to start using intelligent RAID analysis</div>
+                </div>
+            `;
+        }
+
+        // Helper functions
+        function getProviderIcon(provider) {
+            const icons = {
+                openai: '🤖',
+                anthropic: '🧠',
+                gemini: '💎'
+            };
+            return icons[provider] || '🔮';
+        }
+
+        function getProviderStatusClass(status) {
+            return status || 'inactive';
+        }
+
+        function getStatusText(status) {
+            const statusTexts = {
+                active: 'Active',
+                inactive: 'Inactive',
+                error: 'Error',
+                invalid: 'Invalid Key',
+                invalid_key: 'Invalid Key',
+                invalid_model: 'Invalid Model',
+                connection_error: 'Connection Error',
+                validating: 'Validating...',
+                unknown: 'Unknown'
+            };
+            return statusTexts[status] || 'Unknown';
+        }
+
+        function getKeyStatusClass(status) {
+            if (status === 'active') return 'success';
+            if (status === 'error' || status === 'invalid' || status === 'invalid_key') return 'error';
+            return '';
+        }
+
+        function getModelOptions(provider, selectedModel) {
+            const models = PROVIDER_MODELS[provider] || [];
+            return models.map(model => 
+                `<option value="${model.value}" ${model.value === selectedModel ? 'selected' : ''}>${model.label}</option>`
+            ).join('');
+        }
+
+        function renderValidationInfo(provider) {
+            if (!provider.last_validated && provider.status === 'unknown') {
+                return '';
+            }
+
+            let statusClass = 'success';
+            let message = `✅ Validated successfully`;
+            
+            if (provider.status === 'error' || provider.status === 'invalid') {
+                statusClass = 'error';
+                message = `❌ ${getStatusText(provider.status)}`;
+            } else if (provider.status === 'validating') {
+                statusClass = 'validating';
+                message = `🔄 Validation in progress...`;
+            } else if (provider.last_validated) {
+                message += ` • Last checked: ${formatDate(provider.last_validated)}`;
+            }
+
+            return `
+                <div class="validation-info ${statusClass}">
+                    ${message}
+                </div>
+            `;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleString();
+        }
+
+        function updateProviderCount() {
+            const activeCount = providers.filter(p => p.status === 'active').length;
+            const totalCount = providers.length;
+            document.getElementById('provider-count').textContent = `(${activeCount}/${totalCount} active)`;
+        }
+
+        // API calls
+        async function validateProvider(providerId) {
+            if (validationInProgress.has(providerId)) return;
+            
+            validationInProgress.add(providerId);
+            
+            // Update UI to show validating state
+            const provider = providers.find(p => p.id === providerId);
+            provider.status = 'validating';
+            renderProviders();
+            
+            try {
+                const response = await fetch(`${API_BASE}/ai/providers/${providerId}/validate`, {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                // Update provider status
+                provider.status = result.valid ? 'active' : result.status;
+                provider.last_validated = new Date().toISOString();
+                
+            } catch (error) {
+                console.error('Validation failed:', error);
+                provider.status = 'error';
+            } finally {
+                validationInProgress.delete(providerId);
+                renderProviders();
+                updateProviderCount();
+            }
+        }
+
+        async function validateAllProviders() {
+            const button = document.querySelector('.test-all-btn');
+            button.disabled = true;
+            button.innerHTML = '<span>⏳</span><span>Testing...</span>';
+            
+            try {
+                await fetch(`${API_BASE}/ai/providers/validate-all`, {
+                    method: 'POST'
+                });
+                
+                // Simulate progress updates
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += 20;
+                    if (progress <= 100) {
+                        button.innerHTML = `<span>⏳</span><span>Testing... ${progress}%</span>`;
+                    }
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        setTimeout(() => {
+                            loadProviders();
+                            button.disabled = false;
+                            button.innerHTML = '<span>⚡</span><span>Test All Providers</span>';
+                        }, 1000);
+                    }
+                }, 500);
+                
+            } catch (error) {
+                console.error('Batch validation failed:', error);
+                button.disabled = false;
+                button.innerHTML = '<span>⚡</span><span>Test All Providers</span>';
+            }
+        }
+
+        async function updateProvider(providerId, field, value) {
+            const provider = providers.find(p => p.id === providerId);
+            if (!provider) return;
+            
+            provider[field] = value;
+            
+            try {
+                await fetch(`${API_BASE}/ai/providers/${providerId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(provider)
+                });
+            } catch (error) {
+                console.error('Failed to update provider:', error);
+            }
+        }
+
+        async function toggleProvider(providerId, currentEnabled) {
+            await updateProvider(providerId, 'enabled', !currentEnabled);
+            loadProviders();
+        }
+
+        async function deleteProvider(providerId) {
+            if (!confirm('Are you sure you want to delete this provider?')) return;
+            
+            try {
+                await fetch(`${API_BASE}/ai/providers/${providerId}`, {
+                    method: 'DELETE'
+                });
+                loadProviders();
+            } catch (error) {
+                console.error('Failed to delete provider:', error);
+            }
+        }
+
+        // Modal functions
+        function openAddProviderModal() {
+            document.getElementById('add-provider-modal').classList.remove('hidden');
+        }
+
+        function closeAddProviderModal() {
+            document.getElementById('add-provider-modal').classList.add('hidden');
+            document.getElementById('add-provider-form').reset();
+        }
+
+        async function handleAddProvider(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const provider = {
+                name: document.getElementById('new-provider-name').value,
+                provider: document.getElementById('new-provider-type').value,
+                model: document.getElementById('new-provider-model').value,
+                api_key: document.getElementById('new-provider-key').value,
+                enabled: true
+            };
+            
+            try {
+                await fetch(`${API_BASE}/ai/providers`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(provider)
+                });
+                
+                closeAddProviderModal();
+                loadProviders();
+            } catch (error) {
+                console.error('Failed to add provider:', error);
+                alert('Failed to add provider. Please try again.');
+            }
+        }
+
+        function updateModelOptions() {
+            const providerSelect = document.getElementById('new-provider-type');
+            const modelSelect = document.getElementById('new-provider-model');
+            const provider = providerSelect.value;
+            
+            modelSelect.innerHTML = '<option value="">Select Model</option>';
+            
+            if (provider && PROVIDER_MODELS[provider]) {
+                PROVIDER_MODELS[provider].forEach(model => {
+                    const option = document.createElement('option');
+                    option.value = model.value;
+                    option.textContent = model.label;
+                    modelSelect.appendChild(option);
+                });
+            }
+        }
+
+        async function loadAvailableModels() {
+            document.getElementById('models-modal').classList.remove('hidden');
+            
+            try {
+                const response = await fetch(`${API_BASE}/ai/models`);
+                const models = await response.json();
+                
+                let content = '';
+                Object.entries(models).forEach(([provider, modelList]) => {
+                    content += `
+                        <div style="margin-bottom: 24px;">
+                            <h4 style="color: var(--accent-orange); margin-bottom: 12px; text-transform: capitalize;">${provider}</h4>
+                            <ul style="list-style: none; padding-left: 16px;">
+                                ${modelList.map(model => `<li style="margin-bottom: 8px; color: var(--text-secondary);">• ${model}</li>`).join('')}
+                            </ul>
+                        </div>
+                    `;
+                });
+                
+                document.getElementById('models-content').innerHTML = content;
+                
+            } catch (error) {
+                document.getElementById('models-content').innerHTML = 'Failed to load models.';
+            }
+        }
+
+        function closeModelsModal() {
+            document.getElementById('models-modal').classList.add('hidden');
+        }
+
+        function toggleKeyVisibility(element) {
+            const input = element.previousElementSibling;
+            if (input.type === 'password') {
+                input.type = 'text';
+                element.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                element.textContent = '👁️';
+            }
+        }
+
+        function exportConfiguration() {
+            const config = {
+                providers: providers,
+                exported_at: new Date().toISOString(),
+                version: '2.0.0'
+            };
+            
+            const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `raidmaster-ai-config-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importConfiguration() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = async (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                try {
+                    const text = await file.text();
+                    const config = JSON.parse(text);
+                    
+                    if (config.providers && Array.isArray(config.providers)) {
+                        // Import providers
+                        for (const provider of config.providers) {
+                            await fetch(`${API_BASE}/ai/providers`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(provider)
+                            });
+                        }
+                        
+                        loadProviders();
+                        alert('Configuration imported successfully!');
+                    } else {
+                        alert('Invalid configuration file format.');
+                    }
+                } catch (error) {
+                    console.error('Import failed:', error);
+                    alert('Failed to import configuration.');
+                }
+            };
+            input.click();
+        }
+    </script>
+</body>
+</html>
