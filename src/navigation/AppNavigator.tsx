@@ -27,6 +27,7 @@ import ReportsScreen from '../screens/ReportsScreen';
 import MatrixScreen from '../screens/MatrixScreen';
 import AIConfigScreen from '../screens/AIConfigScreen';
 import AIAnalysisScreen from '../screens/AIAnalysisScreen';
+import WebIcon from '../components/WebIcon';
 
 // Type definitions
 export type RootStackParamList = {
