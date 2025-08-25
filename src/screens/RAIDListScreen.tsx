@@ -126,7 +126,7 @@ const RAIDListScreen: React.FC = () => {
 
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
-      <Icon name="folder-open-outline" size={80} color={theme.colors.onSurfaceVariant} />
+      <WebIcon name="folder-open-outline" size={80} color={theme.colors.onSurfaceVariant} />
       <Text variant="headlineSmall" style={styles.emptyTitle}>
         No RAID items yet
       </Text>
