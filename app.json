@@ -16,8 +16,7 @@
     ],
     "platforms": [
       "ios",
-      "android",
-      "web"
+      "android"
     ],
     "android": {
       "package": "com.raidmaster.app",
