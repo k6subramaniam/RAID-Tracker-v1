@@ -3,19 +3,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useTheme } from 'react-native-paper';
-import { Platform } from 'react-native';
-
-// Web-compatible icon import
-const Icon = Platform.OS === 'web' 
-  ? ({ name, size, color }: { name: string; size: number; color: string }) => (
-      <span style={{ fontSize: size, color, fontFamily: 'monospace' }}>
-        {name === 'alert-circle-outline' ? '⚠' : 
-         name === 'calculator' ? '🧮' :
-         name === 'shield-check-outline' ? '🛡' :
-         name === 'chart-bar' ? '📊' : '•'}
-      </span>
-    )
-  : require('react-native-vector-icons/MaterialCommunityIcons').default;
 
 // Import screens
 import RAIDListScreen from '../screens/RAIDListScreen';
