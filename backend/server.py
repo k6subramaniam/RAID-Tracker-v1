@@ -3,17 +3,19 @@ import json
 import asyncio
 from typing import List, Dict, Any, Optional
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from emergentintegrations.llm.chat import LlmChat, UserMessage
+import aiohttp
+import time
 
 # Load environment variables
 load_dotenv()
 
-app = FastAPI(title="RAIDMASTER AI API", version="1.0.0")
+app = FastAPI(title="RAIDMASTER Multi-AI API", version="2.0.0")
 
-# CORS middleware for React Native
+# CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -36,9 +38,32 @@ class RAIDItem(BaseModel):
     owner: str
     dueDate: Optional[str] = None
 
+class AIProvider(BaseModel):
+    id: str
+    name: str
+    provider: str  # "openai", "anthropic", "gemini"
+    model: str
+    api_key: str
+    enabled: bool = True
+    created_at: Optional[str] = None
+    last_validated: Optional[str] = None
+    status: Optional[str] = "unknown"  # "active", "invalid", "error", "unknown"
+
 class AIAnalysisRequest(BaseModel):
     item: RAIDItem
-    analysisType: str  # "analysis" or "validation"
+    analysisType: str = "analysis"  # "analysis" or "validation"
+    provider_id: Optional[str] = None  # If None, use default/best available
+
+class AIValidationRequest(BaseModel):
+    provider: AIProvider
+    test_prompt: Optional[str] = "Hello, this is a test. Please respond with 'API connection successful.'"
+
+class AIValidationResponse(BaseModel):
+    valid: bool
+    status: str
+    message: str
+    response_time: Optional[float] = None
+    model_info: Optional[Dict[str, Any]] = None
 
 class AIAnalysisResponse(BaseModel):
     analysis: str
@@ -46,72 +71,179 @@ class AIAnalysisResponse(BaseModel):
     suggestedStatus: Optional[str] = None
     confidence: float
     flags: List[Dict[str, Any]]
+    provider_used: str
+    response_time: float
 
-class AIBatchRequest(BaseModel):
-    items: List[RAIDItem]
-    analysisType: str
-
-class AIBatchResponse(BaseModel):
-    results: List[Dict[str, Any]]
-
-# AI Analysis Service
-class RAIDAIService:
+# AI Provider Management
+class MultiAIManager:
     def __init__(self):
-        self.api_key = os.getenv("EMERGENT_LLM_KEY")
-        if not self.api_key:
-            raise Exception("EMERGENT_LLM_KEY not found in environment variables")
+        self.providers: Dict[str, AIProvider] = {}
+        self.load_default_providers()
     
-    async def analyze_item(self, item: RAIDItem, analysis_type: str = "analysis") -> AIAnalysisResponse:
-        """Analyze a single RAID item using AI"""
+    def load_default_providers(self):
+        """Load default providers from environment variables"""
+        emergent_key = os.getenv("EMERGENT_LLM_KEY")
+        if emergent_key:
+            # Add Emergent providers as defaults
+            default_providers = [
+                AIProvider(
+                    id="openai_gpt5",
+                    name="OpenAI GPT-5",
+                    provider="openai",
+                    model="gpt-5",
+                    api_key=emergent_key,
+                    enabled=True,
+                    status="unknown"
+                ),
+                AIProvider(
+                    id="claude_opus4",
+                    name="Claude Opus 4.1",
+                    provider="anthropic", 
+                    model="claude-4-opus-20250514",
+                    api_key=emergent_key,
+                    enabled=True,
+                    status="unknown"
+                ),
+                AIProvider(
+                    id="gemini_25",
+                    name="Gemini 2.5 Pro",
+                    provider="gemini",
+                    model="gemini-2.5-pro",
+                    api_key=emergent_key,
+                    enabled=True,
+                    status="unknown"
+                )
+            ]
+            
+            for provider in default_providers:
+                self.providers[provider.id] = provider
+    
+    async def validate_provider(self, provider: AIProvider) -> AIValidationResponse:
+        """Validate an AI provider's API key and model"""
+        start_time = time.time()
+        
         try:
             # Create LLM chat instance
             chat = LlmChat(
-                api_key=self.api_key,
-                session_id=f"raid-{item.id}",
+                api_key=provider.api_key,
+                session_id=f"validation-{provider.id}-{int(time.time())}",
+                system_message="You are a helpful AI assistant for API validation."
+            ).with_model(provider.provider, provider.model)
+            
+            # Test with a simple message
+            test_message = UserMessage(text="Please respond with exactly: 'API connection successful'")
+            response = await chat.send_message(test_message)
+            
+            response_time = time.time() - start_time
+            
+            if "API connection successful" in response or "successful" in response.lower():
+                # Update provider status
+                provider.status = "active"
+                provider.last_validated = time.strftime('%Y-%m-%d %H:%M:%S')
+                
+                return AIValidationResponse(
+                    valid=True,
+                    status="active",
+                    message="API key and model validated successfully",
+                    response_time=round(response_time, 2),
+                    model_info={
+                        "provider": provider.provider,
+                        "model": provider.model,
+                        "response_length": len(response)
+                    }
+                )
+            else:
+                provider.status = "error"
+                return AIValidationResponse(
+                    valid=False,
+                    status="error",
+                    message="Unexpected response from API",
+                    response_time=round(response_time, 2)
+                )
+                
+        except Exception as e:
+            provider.status = "invalid"
+            error_msg = str(e)
+            
+            # Classify error types
+            if "unauthorized" in error_msg.lower() or "invalid" in error_msg.lower():
+                status = "invalid_key"
+                message = "Invalid API key"
+            elif "not found" in error_msg.lower() or "model" in error_msg.lower():
+                status = "invalid_model"
+                message = f"Model '{provider.model}' not found or not accessible"
+            else:
+                status = "connection_error"
+                message = f"Connection failed: {error_msg[:100]}"
+            
+            return AIValidationResponse(
+                valid=False,
+                status=status,
+                message=message,
+                response_time=round(time.time() - start_time, 2)
+            )
+    
+    async def analyze_with_provider(self, item: RAIDItem, provider: AIProvider, analysis_type: str = "analysis") -> AIAnalysisResponse:
+        """Analyze RAID item using specific provider"""
+        start_time = time.time()
+        
+        try:
+            # Create LLM chat instance
+            chat = LlmChat(
+                api_key=provider.api_key,
+                session_id=f"raid-analysis-{item.id}-{int(time.time())}",
                 system_message=self._get_system_message(analysis_type)
-            ).with_model("openai", "gpt-4o-mini")
+            ).with_model(provider.provider, provider.model)
             
-            # Prepare the analysis prompt
-            prompt = self._build_prompt(item, analysis_type)
+            # Build analysis prompt
+            prompt = self._build_analysis_prompt(item, analysis_type)
             
-            # Send message to AI
+            # Send message
             user_message = UserMessage(text=prompt)
             response = await chat.send_message(user_message)
             
-            # Parse AI response
-            return self._parse_ai_response(response, analysis_type)
+            response_time = time.time() - start_time
+            
+            # Parse response
+            analysis_result = self._parse_ai_response(response, analysis_type)
+            
+            return AIAnalysisResponse(
+                analysis=analysis_result.analysis,
+                suggestedPriority=analysis_result.suggestedPriority,
+                suggestedStatus=analysis_result.suggestedStatus,
+                confidence=analysis_result.confidence,
+                flags=analysis_result.flags,
+                provider_used=f"{provider.name} ({provider.model})",
+                response_time=round(response_time, 2)
+            )
             
         except Exception as e:
-            print(f"Error in AI analysis: {str(e)}")
-            return self._get_fallback_response(item)
+            # Return fallback response on error
+            return AIAnalysisResponse(
+                analysis=f"Analysis failed with {provider.name}: {str(e)[:100]}",
+                suggestedPriority=item.priority,
+                suggestedStatus=item.status,
+                confidence=0.0,
+                flags=[{
+                    "code": "PROVIDER_ERROR",
+                    "message": f"Error using {provider.name}: {str(e)[:50]}",
+                    "severity": "high"
+                }],
+                provider_used=f"{provider.name} (Error)",
+                response_time=round(time.time() - start_time, 2)
+            )
     
-    async def batch_analyze(self, items: List[RAIDItem], analysis_type: str = "analysis") -> List[Dict[str, Any]]:
-        """Analyze multiple RAID items in batch"""
-        results = []
+    async def get_best_provider(self) -> Optional[AIProvider]:
+        """Get the best available provider (active and fastest)"""
+        active_providers = [p for p in self.providers.values() if p.enabled and p.status == "active"]
+        if not active_providers:
+            return None
         
-        # Analyze items concurrently (but limit concurrency to avoid rate limits)
-        semaphore = asyncio.Semaphore(3)  # Max 3 concurrent requests
-        
-        async def analyze_with_semaphore(item):
-            async with semaphore:
-                analysis = await self.analyze_item(item, analysis_type)
-                return {
-                    "itemId": item.id,
-                    "itemTitle": item.title,
-                    "analysis": analysis.analysis,
-                    "suggestedPriority": analysis.suggestedPriority,
-                    "suggestedStatus": analysis.suggestedStatus,
-                    "confidence": analysis.confidence,
-                    "flags": analysis.flags
-                }
-        
-        tasks = [analyze_with_semaphore(item) for item in items]
-        results = await asyncio.gather(*tasks)
-        
-        return results
+        # Return first active provider (could be enhanced with performance metrics)
+        return active_providers[0]
     
     def _get_system_message(self, analysis_type: str) -> str:
-        """Get appropriate system message based on analysis type"""
+        """Get system message based on analysis type"""
         if analysis_type == "validation":
             return """You are an expert RAID (Risks, Assumptions, Issues, Dependencies) data quality validator. 
             Your job is to validate RAID items for completeness, clarity, and data quality issues.
@@ -121,8 +253,8 @@ class RAIDAIService:
             Analyze items carefully and provide clear, actionable recommendations for priority and status.
             Consider impact, likelihood, and business context in your analysis."""
     
-    def _build_prompt(self, item: RAIDItem, analysis_type: str) -> str:
-        """Build analysis prompt for the AI"""
+    def _build_analysis_prompt(self, item: RAIDItem, analysis_type: str) -> str:
+        """Build analysis prompt"""
         item_context = f"""
 RAID Item Analysis:
 - Type: {item.type}
@@ -176,10 +308,10 @@ Respond in JSON format:
     ]
 }}"""
     
-    def _parse_ai_response(self, response: str, analysis_type: str) -> AIAnalysisResponse:
-        """Parse AI response and extract structured data"""
+    def _parse_ai_response(self, response: str, analysis_type: str):
+        """Parse AI response into structured format"""
         try:
-            # Try to extract JSON from response
+            # Extract JSON from response
             start = response.find('{')
             end = response.rfind('}') + 1
             
@@ -187,96 +319,206 @@ Respond in JSON format:
                 json_str = response[start:end]
                 data = json.loads(json_str)
                 
-                return AIAnalysisResponse(
-                    analysis=data.get("analysis", "Analysis completed"),
-                    suggestedPriority=data.get("suggestedPriority", "P2"),
-                    suggestedStatus=data.get("suggestedStatus"),
-                    confidence=float(data.get("confidence", 0.75)),
-                    flags=data.get("flags", [])
-                )
+                class ParsedResponse:
+                    def __init__(self, data):
+                        self.analysis = data.get("analysis", "Analysis completed")
+                        self.suggestedPriority = data.get("suggestedPriority", "P2")
+                        self.suggestedStatus = data.get("suggestedStatus")
+                        self.confidence = float(data.get("confidence", 0.75))
+                        self.flags = data.get("flags", [])
+                
+                return ParsedResponse(data)
             else:
-                # Fallback if JSON parsing fails
-                return AIAnalysisResponse(
-                    analysis=response[:200] + "..." if len(response) > 200 else response,
-                    suggestedPriority="P2",
-                    confidence=0.5,
-                    flags=[]
-                )
+                # Fallback parsing
+                class FallbackResponse:
+                    def __init__(self, response_text):
+                        self.analysis = response_text[:200] + "..." if len(response_text) > 200 else response_text
+                        self.suggestedPriority = "P2"
+                        self.suggestedStatus = None
+                        self.confidence = 0.5
+                        self.flags = []
+                
+                return FallbackResponse(response)
                 
         except Exception as e:
-            print(f"Error parsing AI response: {str(e)}")
-            return self._get_fallback_response_parsed(response)
-    
-    def _get_fallback_response(self, item: RAIDItem) -> AIAnalysisResponse:
-        """Provide fallback response when AI analysis fails"""
-        return AIAnalysisResponse(
-            analysis=f"Unable to complete AI analysis for this {item.type}. Please review manually.",
-            suggestedPriority=item.priority,
-            confidence=0.0,
-            flags=[{
-                "code": "AI_ERROR",
-                "message": "AI analysis service unavailable",
-                "severity": "medium"
-            }]
-        )
-    
-    def _get_fallback_response_parsed(self, response: str) -> AIAnalysisResponse:
-        """Fallback when response parsing fails"""
-        return AIAnalysisResponse(
-            analysis=response[:100] + "..." if len(response) > 100 else response,
-            suggestedPriority="P2",
-            confidence=0.5,
-            flags=[{
-                "code": "PARSE_ERROR",
-                "message": "Unable to parse AI response format",
-                "severity": "low"
-            }]
-        )
+            class ErrorResponse:
+                def __init__(self, error):
+                    self.analysis = f"Error parsing response: {str(error)}"
+                    self.suggestedPriority = "P2"
+                    self.suggestedStatus = None
+                    self.confidence = 0.0
+                    self.flags = [{"code": "PARSE_ERROR", "message": str(error), "severity": "medium"}]
+            
+            return ErrorResponse(e)
 
-# Initialize AI service
-ai_service = RAIDAIService()
+# Initialize AI Manager
+ai_manager = MultiAIManager()
 
 # API Endpoints
 @app.get("/api/health")
 async def health_check():
     """Health check endpoint"""
-    return {"status": "healthy", "service": "RAIDMASTER AI API"}
+    return {
+        "status": "healthy", 
+        "service": "RAIDMASTER Multi-AI API",
+        "providers_count": len(ai_manager.providers),
+        "active_providers": len([p for p in ai_manager.providers.values() if p.status == "active"])
+    }
+
+@app.get("/api/ai/providers")
+async def get_providers():
+    """Get all AI providers"""
+    providers_list = []
+    for provider in ai_manager.providers.values():
+        # Don't expose the full API key, just show masked version
+        masked_key = provider.api_key[:8] + "..." + provider.api_key[-4:] if provider.api_key else "Not set"
+        providers_list.append({
+            "id": provider.id,
+            "name": provider.name,
+            "provider": provider.provider,
+            "model": provider.model,
+            "api_key_masked": masked_key,
+            "enabled": provider.enabled,
+            "status": provider.status,
+            "last_validated": provider.last_validated,
+            "created_at": provider.created_at
+        })
+    
+    return {"providers": providers_list}
+
+@app.post("/api/ai/providers")
+async def add_provider(provider: AIProvider):
+    """Add new AI provider"""
+    # Generate ID if not provided
+    if not provider.id:
+        provider.id = f"{provider.provider}_{provider.model}_{int(time.time())}"
+    
+    # Set creation time
+    provider.created_at = time.strftime('%Y-%m-%d %H:%M:%S')
+    
+    # Add to manager
+    ai_manager.providers[provider.id] = provider
+    
+    return {"message": "Provider added successfully", "provider_id": provider.id}
+
+@app.put("/api/ai/providers/{provider_id}")
+async def update_provider(provider_id: str, updated_provider: AIProvider):
+    """Update existing AI provider"""
+    if provider_id not in ai_manager.providers:
+        raise HTTPException(status_code=404, detail="Provider not found")
+    
+    # Preserve original creation time and ID
+    original_provider = ai_manager.providers[provider_id]
+    updated_provider.id = provider_id
+    updated_provider.created_at = original_provider.created_at
+    
+    # Update provider
+    ai_manager.providers[provider_id] = updated_provider
+    
+    return {"message": "Provider updated successfully"}
+
+@app.delete("/api/ai/providers/{provider_id}")
+async def delete_provider(provider_id: str):
+    """Delete AI provider"""
+    if provider_id not in ai_manager.providers:
+        raise HTTPException(status_code=404, detail="Provider not found")
+    
+    del ai_manager.providers[provider_id]
+    return {"message": "Provider deleted successfully"}
+
+@app.post("/api/ai/providers/{provider_id}/validate")
+async def validate_provider(provider_id: str):
+    """Validate specific AI provider"""
+    if provider_id not in ai_manager.providers:
+        raise HTTPException(status_code=404, detail="Provider not found")
+    
+    provider = ai_manager.providers[provider_id]
+    validation_result = await ai_manager.validate_provider(provider)
+    
+    return validation_result
+
+@app.post("/api/ai/providers/validate-all")
+async def validate_all_providers(background_tasks: BackgroundTasks):
+    """Validate all enabled providers in background"""
+    enabled_providers = [p for p in ai_manager.providers.values() if p.enabled]
+    
+    async def validate_all():
+        for provider in enabled_providers:
+            await ai_manager.validate_provider(provider)
+    
+    background_tasks.add_task(validate_all)
+    
+    return {
+        "message": f"Validation started for {len(enabled_providers)} providers",
+        "providers_count": len(enabled_providers)
+    }
 
 @app.post("/api/analyze", response_model=AIAnalysisResponse)
 async def analyze_item(request: AIAnalysisRequest):
-    """Analyze a single RAID item with AI"""
+    """Analyze RAID item with AI"""
     try:
-        result = await ai_service.analyze_item(request.item, request.analysisType)
+        # Use specific provider or get best available
+        if request.provider_id:
+            if request.provider_id not in ai_manager.providers:
+                raise HTTPException(status_code=404, detail="Provider not found")
+            provider = ai_manager.providers[request.provider_id]
+        else:
+            provider = await ai_manager.get_best_provider()
+            if not provider:
+                raise HTTPException(status_code=503, detail="No active AI providers available")
+        
+        # Perform analysis
+        result = await ai_manager.analyze_with_provider(request.item, provider, request.analysisType)
         return result
+        
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/api/batch-analyze", response_model=AIBatchResponse)
-async def batch_analyze_items(request: AIBatchRequest):
-    """Analyze multiple RAID items in batch"""
-    try:
-        results = await ai_service.batch_analyze(request.items, request.analysisType)
-        return AIBatchResponse(results=results)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/api/validate", response_model=AIAnalysisResponse)
-async def validate_item(request: AIAnalysisRequest):
-    """Validate a RAID item for data quality"""
-    try:
-        # Force validation type
-        result = await ai_service.analyze_item(request.item, "validation")
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/api/ai/config")
-async def get_ai_config():
-    """Get current AI configuration"""
+@app.post("/api/analyze/multi")
+async def analyze_multi_provider(request: AIAnalysisRequest):
+    """Analyze item using multiple providers for comparison"""
+    active_providers = [p for p in ai_manager.providers.values() if p.enabled and p.status == "active"]
+    
+    if not active_providers:
+        raise HTTPException(status_code=503, detail="No active providers available")
+    
+    # Analyze with up to 3 providers concurrently
+    tasks = []
+    for provider in active_providers[:3]:
+        task = ai_manager.analyze_with_provider(request.item, provider, request.analysisType)
+        tasks.append(task)
+    
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+    
+    # Filter successful results
+    successful_results = [r for r in results if isinstance(r, AIAnalysisResponse)]
+    
     return {
-        "model": "gpt-4o-mini",
-        "provider": "openai",
-        "available": bool(ai_service.api_key)
+        "results": successful_results,
+        "providers_used": len(successful_results),
+        "consensus": {
+            "average_confidence": sum(r.confidence for r in successful_results) / len(successful_results) if successful_results else 0,
+            "most_common_priority": max(set(r.suggestedPriority for r in successful_results), key=[r.suggestedPriority for r in successful_results].count) if successful_results else "P2"
+        }
+    }
+
+@app.get("/api/ai/models")
+async def get_available_models():
+    """Get list of available models for each provider"""
+    return {
+        "openai": [
+            "gpt-5", "gpt-5-mini", "gpt-4o", "gpt-4o-mini", 
+            "gpt-4", "o1", "o1-mini", "o3", "o3-mini"
+        ],
+        "anthropic": [
+            "claude-4-opus-20250514", "claude-4-sonnet-20250514",
+            "claude-3-7-sonnet-20250219", "claude-3-5-sonnet-20241022", 
+            "claude-3-5-haiku-20241022"
+        ],
+        "gemini": [
+            "gemini-2.5-pro", "gemini-2.5-flash", "gemini-2.0-flash", 
+            "gemini-2.0-flash-lite", "gemini-1.5-pro", "gemini-1.5-flash"
+        ]
     }
 
 if __name__ == "__main__":
