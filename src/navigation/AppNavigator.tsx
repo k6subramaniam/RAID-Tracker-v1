@@ -98,7 +98,7 @@ const MainTabs: React.FC = () => {
         options={{
           title: 'Calculator',
           tabBarIcon: ({ color, size }) => (
-            <Icon name="calculator" size={size} color={color} />
+            <WebIcon name="calculator" size={size} color={color} />
           ),
         }}
       />
