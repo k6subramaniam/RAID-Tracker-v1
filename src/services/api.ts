@@ -48,6 +48,32 @@ interface AIBatchResponse {
   }>;
 }
 
+// AI Provider Management Interfaces
+interface AIProvider {
+  id: string;
+  name: string;
+  provider: 'openai' | 'anthropic' | 'gemini';
+  model: string;
+  api_key?: string;
+  api_key_masked: string;
+  enabled: boolean;
+  status: 'active' | 'inactive' | 'error' | 'validating' | 'invalid';
+  last_validated?: string;
+}
+
+interface AIProvidersResponse {
+  providers: AIProvider[];
+  total: number;
+  active: number;
+}
+
+interface ValidationResponse {
+  valid: boolean;
+  status: string;
+  error?: string;
+  model_info?: any;
+}
+
 class APIService {
   private baseUrl = API_BASE_URL;
 
@@ -61,7 +87,154 @@ class APIService {
     }
   }
 
-  // Analyze single item
+  // AI Provider Management
+  async getAIProviders(): Promise<AIProvidersResponse> {
+    try {
+      const response = await fetch(`${this.baseUrl}/ai/providers`);
+      if (!response.ok) {
+        throw new Error(`Failed to get AI providers: ${response.statusText}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Get AI providers error:', error);
+      throw error;
+    }
+  }
+
+  async addAIProvider(provider: {
+    name: string;
+    provider: string;
+    model: string;
+    api_key: string;
+  }): Promise<AIProvider> {
+    try {
+      const response = await fetch(`${this.baseUrl}/ai/providers`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(provider),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to add AI provider: ${response.statusText}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Add AI provider error:', error);
+      throw error;
+    }
+  }
+
+  async updateAIProvider(providerId: string, updates: Partial<AIProvider>): Promise<AIProvider> {
+    try {
+      const response = await fetch(`${this.baseUrl}/ai/providers/${providerId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updates),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to update AI provider: ${response.statusText}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Update AI provider error:', error);
+      throw error;
+    }
+  }
+
+  async deleteAIProvider(providerId: string): Promise<void> {
+    try {
+      const response = await fetch(`${this.baseUrl}/ai/providers/${providerId}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to delete AI provider: ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error('Delete AI provider error:', error);
+      throw error;
+    }
+  }
+
+  async validateAIProvider(providerId: string): Promise<ValidationResponse> {
+    try {
+      const response = await fetch(`${this.baseUrl}/ai/providers/${providerId}/validate`, {
+        method: 'POST',
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to validate AI provider: ${response.statusText}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Validate AI provider error:', error);
+      throw error;
+    }
+  }
+
+  async validateAllProviders(): Promise<{ results: ValidationResponse[] }> {
+    try {
+      const response = await fetch(`${this.baseUrl}/ai/providers/validate-all`, {
+        method: 'POST',
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to validate all providers: ${response.statusText}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Validate all providers error:', error);
+      throw error;
+    }
+  }
+
+  // Text Analysis (Multi-Provider)
+  async analyzeText(text: string, providers: string[] = []): Promise<{
+    results: Array<{
+      provider: string;
+      model: string;
+      analysis: any;
+      confidence: number;
+      processing_time: number;
+    }>;
+    consensus: {
+      risks: string[];
+      assumptions: string[];
+      issues: string[];
+      dependencies: string[];
+      confidence_score: number;
+    };
+  }> {
+    try {
+      const response = await fetch(`${this.baseUrl}/ai/analyze-text`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text, providers }),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to analyze text: ${response.statusText}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Analyze text error:', error);
+      throw error;
+    }
+  }
+
+  // Analyze single item (legacy support)
   async analyzeItem(item: RAIDItem, analysisType: 'analysis' | 'validation' = 'analysis'): Promise<AIAnalysis> {
     try {
       const request: AIAnalysisRequest = { item, analysisType };
