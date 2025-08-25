@@ -1,0 +1,131 @@
+# GitHub Workflow for Android APK Build
+# 
+# SETUP INSTRUCTIONS:
+# 1. Create the directory: .github/workflows/
+# 2. Copy this file as: .github/workflows/build-android-apk.yml
+# 3. Add EXPO_TOKEN secret to your repository settings
+# 4. Go to GitHub Actions tab and run the workflow
+#
+# This workflow needs to be created manually due to GitHub App permissions
+
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: 'Build profile to use'
+        required: true
+        default: 'apk-unsigned'
+        type: choice
+        options:
+        - apk-unsigned
+        - development
+        - preview
+        - apk
+  push:
+    branches:
+      - main
+      - genspark_ai_developer
+    paths:
+      - 'src/**'
+      - 'App.tsx'
+      - 'app.json'
+      - 'eas.json'
+      - 'package.json'
+
+jobs:
+  build:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 🔍 Check for EXPO_TOKEN
+        run: |
+          if [ -z "${{ secrets.EXPO_TOKEN }}" ]; then
+            echo "❌ EXPO_TOKEN secret is not set"
+            echo "Please add your Expo access token as a repository secret"
+            echo "Get your token from: https://expo.dev/accounts/[username]/settings/access-tokens"
+            exit 1
+          else
+            echo "✅ EXPO_TOKEN is configured"
+          fi
+
+      - name: 📦 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🏗 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: 🏗 Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 📋 Install dependencies
+        run: npm ci
+
+      - name: 🧹 Clean build cache
+        run: |
+          npx expo prebuild --clear --platform android || true
+          rm -rf android/app/build || true
+          rm -rf android/build || true
+
+      - name: 🔧 Validate configuration
+        run: |
+          echo "Validating EAS configuration..."
+          npx eas --version
+          echo "Checking app.json..."
+          cat app.json | jq '.expo.android'
+          echo "Checking eas.json..."
+          cat eas.json | jq '.build'
+
+      - name: 🚀 Build Android APK
+        run: |
+          BUILD_PROFILE="${{ github.event.inputs.profile || 'apk-unsigned' }}"
+          echo "Building with profile: $BUILD_PROFILE"
+          
+          case $BUILD_PROFILE in
+            "apk-unsigned")
+              echo "🔨 Building unsigned APK for testing..."
+              npx eas build --platform android --profile apk-unsigned --non-interactive --no-wait
+              ;;
+            "development")
+              echo "🔨 Building development APK..."
+              npx eas build --platform android --profile development --non-interactive --no-wait
+              ;;
+            "preview")
+              echo "🔨 Building preview APK..."
+              npx eas build --platform android --profile preview --non-interactive --no-wait
+              ;;
+            "apk")
+              echo "🔨 Building release APK..."
+              npx eas build --platform android --profile apk --non-interactive --no-wait
+              ;;
+            *)
+              echo "❌ Invalid build profile: $BUILD_PROFILE"
+              exit 1
+              ;;
+          esac
+
+      - name: 📝 Build Summary
+        run: |
+          echo "## 🎉 Build Submitted Successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Profile:** ${{ github.event.inputs.profile || 'apk-unsigned' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Platform:** Android" >> $GITHUB_STEP_SUMMARY
+          echo "**Output:** APK" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📱 Next Steps:" >> $GITHUB_STEP_SUMMARY
+          echo "1. Monitor build progress at: https://expo.dev/accounts/[your-username]/projects/raidmaster/builds" >> $GITHUB_STEP_SUMMARY
+          echo "2. Download the APK when build completes" >> $GITHUB_STEP_SUMMARY
+          echo "3. Test the APK on your Android device" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔗 Useful Links:" >> $GITHUB_STEP_SUMMARY
+          echo "- [EAS Build Dashboard](https://expo.dev)" >> $GITHUB_STEP_SUMMARY
+          echo "- [Build Documentation](./APK_BUILD_TROUBLESHOOTING.md)" >> $GITHUB_STEP_SUMMARY
