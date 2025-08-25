@@ -1,4 +1,4 @@
-import { ItemType, ItemStatus, Priority, Impact, Likelihood, Workstream, Owner } from '../types';
+import { ItemType, ItemStatus, Priority, Impact, Likelihood, Workstream, Owner, RAIDItem } from '../types';
 
 export const ITEM_TYPES: ItemType[] = ['Risk', 'Assumption', 'Issue', 'Dependency'];
 
@@ -35,6 +35,72 @@ export const DEFAULT_OWNERS: Owner[] = [
   { id: 'mike_johnson', name: 'Mike Johnson', role: 'Product Owner', initials: 'MJ' },
   { id: 'sarah_wilson', name: 'Sarah Wilson', role: 'Engineering Manager', initials: 'SW' },
   { id: 'david_brown', name: 'David Brown', role: 'Team Lead', initials: 'DB' },
+];
+
+export const SAMPLE_RAID_ITEMS: Omit<RAIDItem, 'id' | 'createdAt' | 'updatedAt' | 'history'>[] = [
+  {
+    type: 'Risk',
+    title: 'API Rate Limiting Issues',
+    description: 'Third-party API may impose rate limits that could affect system performance during peak usage.',
+    status: 'Open',
+    priority: 'P2',
+    impact: 'High',
+    likelihood: 'Medium',
+    severityScore: 6,
+    workstream: 'engineering',
+    owner: 'jane_smith',
+    governanceTags: ['Technical'],
+    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+    references: ['https://api-docs.example.com/rate-limits'],
+    attachments: [],
+  },
+  {
+    type: 'Issue',
+    title: 'Authentication Service Downtime',
+    description: 'Users unable to login due to authentication service instability affecting 15% of user base.',
+    status: 'In Progress',
+    priority: 'P1',
+    impact: 'Critical',
+    likelihood: 'High',
+    severityScore: 10,
+    workstream: 'engineering',
+    owner: 'sarah_wilson',
+    governanceTags: ['Critical', 'Security'],
+    dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
+    references: [],
+    attachments: [],
+  },
+  {
+    type: 'Assumption',
+    title: 'User Adoption Rate',
+    description: 'Assuming 40% adoption rate within first quarter based on beta testing feedback.',
+    status: 'Proposed',
+    priority: 'P3',
+    impact: 'Medium',
+    likelihood: 'Medium',
+    severityScore: 3,
+    workstream: 'product',
+    owner: 'mike_johnson',
+    governanceTags: ['Business'],
+    references: ['https://analytics.example.com/adoption-metrics'],
+    attachments: [],
+  },
+  {
+    type: 'Dependency',
+    title: 'Design System Component Library',
+    description: 'Frontend development depends on completion of design system component library by design team.',
+    status: 'Open',
+    priority: 'P2',
+    impact: 'High',
+    likelihood: 'Low',
+    severityScore: 5,
+    workstream: 'design',
+    owner: 'john_doe',
+    governanceTags: ['Dependencies'],
+    dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
+    references: [],
+    attachments: [],
+  },
 ];
 
 export const SEVERITY_MATRIX = {
