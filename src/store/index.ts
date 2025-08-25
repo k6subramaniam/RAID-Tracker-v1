@@ -239,6 +239,33 @@ export const useStore = create<AppState>()(
         set({ draftItem: draft });
       },
       
+      // Initialization function
+      initializeSampleData: () => {
+        const state = get();
+        if (state.items.length === 0) {
+          // Add sample RAID items
+          SAMPLE_RAID_ITEMS.forEach(item => {
+            const id = generateId();
+            const now = new Date();
+            const newItem: RAIDItem = {
+              ...item,
+              id,
+              createdAt: now,
+              updatedAt: now,
+              history: [{
+                id: generateId(),
+                timestamp: now,
+                actor: 'System',
+                action: 'Created sample item',
+                note: 'Sample data initialization',
+              }],
+            };
+            state.items.push(newItem);
+          });
+          set({ items: [...state.items] });
+        }
+      },
+      
       // Utility functions
       getFilteredItems: () => {
         const state = get();
