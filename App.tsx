@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useStore } from './src/store';
@@ -7,7 +7,12 @@ import AppNavigator from './src/navigation/AppNavigator';
 import { StatusBar } from 'expo-status-bar';
 
 export default function App() {
-  const { themeMode } = useStore();
+  const { themeMode, initializeSampleData } = useStore();
+  
+  // Initialize sample data on app start
+  useEffect(() => {
+    initializeSampleData();
+  }, [initializeSampleData]);
   
   // Determine theme based on user preference
   const theme = themeMode === 'dark' ? darkTheme : lightTheme;
