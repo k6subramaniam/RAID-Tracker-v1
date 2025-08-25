@@ -1,6 +1,17 @@
 import { RAIDItem, AIAnalysis } from '../types';
 
-const API_BASE_URL = 'http://localhost:8001/api';
+// Dynamic API URL based on environment
+const getApiBaseUrl = (): string => {
+  // For development, try different possible backend URLs
+  if (__DEV__) {
+    // Try localhost first, then fallback to other possibilities
+    return 'http://localhost:8001/api';
+  }
+  // For production, use environment variable or default
+  return process.env.REACT_APP_API_URL || 'http://localhost:8001/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 interface AIAnalysisRequest {
   item: RAIDItem;
