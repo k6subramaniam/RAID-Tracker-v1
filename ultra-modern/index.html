@@ -932,11 +932,16 @@
                             <div class="upload-subtitle">Supported formats: .docx, .pdf, plain text</div>
                         </div>
 
-                        <!-- Text Analysis -->
+                        <!-- AI Analysis -->
                         <div class="text-area">
                             <div class="textarea-header">
                                 <div class="textarea-title">Paste your text here...</div>
-                                <div class="character-count" id="char-count">0 characters</div>
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <select id="ai-provider-select" class="form-select" style="width: auto; font-size: 12px;">
+                                        <option value="">Auto-select best provider</option>
+                                    </select>
+                                    <div class="character-count" id="char-count">0 characters</div>
+                                </div>
                             </div>
                             <textarea 
                                 class="text-input" 
@@ -944,6 +949,11 @@
                                 placeholder="Paste meeting notes, project updates, risk assessments, or any text that might contain RAID items. The AI will analyze and extract potential risks, assumptions, issues, and dependencies automatically."
                                 oninput="updateCharCount(this)"
                             ></textarea>
+                        </div>
+
+                        <!-- AI Provider Status -->
+                        <div id="ai-providers-status" class="ai-providers-status" style="margin-bottom: 24px;">
+                            <!-- Provider status will be loaded here -->
                         </div>
 
                         <!-- Action Buttons -->
