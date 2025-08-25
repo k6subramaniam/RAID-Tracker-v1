@@ -41,6 +41,9 @@
       "buildNumber": "1.0.0",
       "supportsTablet": true
     },
+    "web": {
+      "bundler": "metro"
+    },
     "plugins": [
       [
         "expo-build-properties",
