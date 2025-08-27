@@ -568,6 +568,262 @@ async def get_available_models():
         ]
     }
 
+# ============================================================================
+# RAID ITEMS CRUD ENDPOINTS
+# ============================================================================
+
+def calculate_severity_score(impact: str, likelihood: str) -> int:
+    """Calculate severity score based on impact and likelihood"""
+    impact_scores = {"Low": 1, "Medium": 2, "High": 3, "Critical": 4}
+    likelihood_scores = {"Low": 1, "Medium": 2, "High": 3}
+    
+    impact_val = impact_scores.get(impact, 2)
+    likelihood_val = likelihood_scores.get(likelihood, 2)
+    
+    return impact_val * likelihood_val
+
+def add_history_entry(item: RAIDItem, action: str, actor: str = "System", note: str = ""):
+    """Add history entry to RAID item"""
+    if not item.history:
+        item.history = []
+    
+    entry = {
+        "id": str(uuid.uuid4()),
+        "timestamp": datetime.utcnow().isoformat(),
+        "action": action,
+        "actor": actor,
+        "note": note
+    }
+    item.history.append(entry)
+
+@app.get("/api/raid-items")
+async def get_raid_items():
+    """Get all RAID items"""
+    return {
+        "items": raid_items_db,
+        "total": len(raid_items_db)
+    }
+
+@app.get("/api/raid-items/{item_id}")
+async def get_raid_item(item_id: str):
+    """Get specific RAID item by ID"""
+    item = next((item for item in raid_items_db if item["id"] == item_id), None)
+    if not item:
+        raise HTTPException(status_code=404, detail="RAID item not found")
+    return item
+
+@app.post("/api/raid-items")
+async def create_raid_item(item_data: RAIDItemCreate):
+    """Create new RAID item"""
+    # Generate ID and timestamps
+    item_id = str(uuid.uuid4())
+    now = datetime.utcnow().isoformat()
+    
+    # Calculate severity score
+    severity_score = calculate_severity_score(item_data.impact, item_data.likelihood)
+    
+    # Create new item
+    new_item = RAIDItem(
+        id=item_id,
+        **item_data.dict(),
+        severityScore=severity_score,
+        createdAt=now,
+        updatedAt=now,
+        history=[],
+        ai=None,
+        attachments=[]
+    )
+    
+    # Add creation history entry
+    add_history_entry(new_item, "Item Created", "User")
+    
+    # Convert to dict and store
+    item_dict = new_item.dict()
+    raid_items_db.append(item_dict)
+    
+    return {
+        "message": "RAID item created successfully",
+        "item": item_dict
+    }
+
+@app.put("/api/raid-items/{item_id}")
+async def update_raid_item(item_id: str, updates: RAIDItemUpdate):
+    """Update existing RAID item"""
+    # Find item
+    item_index = next((i for i, item in enumerate(raid_items_db) if item["id"] == item_id), None)
+    if item_index is None:
+        raise HTTPException(status_code=404, detail="RAID item not found")
+    
+    current_item = raid_items_db[item_index]
+    
+    # Apply updates
+    update_data = {k: v for k, v in updates.dict().items() if v is not None}
+    
+    # Recalculate severity score if impact/likelihood changed
+    if "impact" in update_data or "likelihood" in update_data:
+        impact = update_data.get("impact", current_item.get("impact", "Medium"))
+        likelihood = update_data.get("likelihood", current_item.get("likelihood", "Medium"))
+        update_data["severityScore"] = calculate_severity_score(impact, likelihood)
+    
+    # Update timestamp
+    update_data["updatedAt"] = datetime.utcnow().isoformat()
+    
+    # Update item
+    current_item.update(update_data)
+    
+    # Add history entry for significant changes
+    if any(k in update_data for k in ["status", "priority", "owner", "dueDate"]):
+        changed_fields = [k for k in ["status", "priority", "owner", "dueDate"] if k in update_data]
+        note = f"Updated: {', '.join(changed_fields)}"
+        
+        if not current_item.get("history"):
+            current_item["history"] = []
+        
+        history_entry = {
+            "id": str(uuid.uuid4()),
+            "timestamp": datetime.utcnow().isoformat(),
+            "action": "Item Updated",
+            "actor": "User",
+            "note": note
+        }
+        current_item["history"].append(history_entry)
+    
+    return {
+        "message": "RAID item updated successfully",
+        "item": current_item
+    }
+
+@app.delete("/api/raid-items/{item_id}")
+async def delete_raid_item(item_id: str):
+    """Delete RAID item"""
+    item_index = next((i for i, item in enumerate(raid_items_db) if item["id"] == item_id), None)
+    if item_index is None:
+        raise HTTPException(status_code=404, detail="RAID item not found")
+    
+    deleted_item = raid_items_db.pop(item_index)
+    
+    return {
+        "message": "RAID item deleted successfully",
+        "deleted_item": deleted_item
+    }
+
+@app.get("/api/raid-items/stats/dashboard")
+async def get_dashboard_stats():
+    """Get dashboard statistics"""
+    if not raid_items_db:
+        return {
+            "total": 0,
+            "by_type": {"Risk": 0, "Issue": 0, "Assumption": 0, "Dependency": 0},
+            "by_status": {},
+            "by_priority": {},
+            "recent_activity": 0,
+            "overdue": 0
+        }
+    
+    # Calculate statistics
+    total = len(raid_items_db)
+    
+    by_type = {"Risk": 0, "Issue": 0, "Assumption": 0, "Dependency": 0}
+    by_status = {}
+    by_priority = {}
+    
+    for item in raid_items_db:
+        # Count by type
+        item_type = item.get("type", "Risk")
+        if item_type in by_type:
+            by_type[item_type] += 1
+        
+        # Count by status
+        status = item.get("status", "Open")
+        by_status[status] = by_status.get(status, 0) + 1
+        
+        # Count by priority
+        priority = item.get("priority", "P2")
+        by_priority[priority] = by_priority.get(priority, 0) + 1
+    
+    # Count recent activity (items updated in last 7 days)
+    from datetime import datetime, timedelta
+    week_ago = (datetime.utcnow() - timedelta(days=7)).isoformat()
+    recent_activity = sum(1 for item in raid_items_db 
+                         if item.get("updatedAt", "") > week_ago)
+    
+    # Count overdue items
+    today = datetime.utcnow().isoformat()[:10]  # YYYY-MM-DD format
+    overdue = sum(1 for item in raid_items_db 
+                  if item.get("dueDate") and item.get("dueDate") < today 
+                  and item.get("status") not in ["Closed", "Resolved"])
+    
+    return {
+        "total": total,
+        "by_type": by_type,
+        "by_status": by_status,
+        "by_priority": by_priority,
+        "recent_activity": recent_activity,
+        "overdue": overdue,
+        "active_items": sum(1 for item in raid_items_db 
+                           if item.get("status") in ["Open", "In Progress", "Mitigating"])
+    }
+
+# ============================================================================
+# FILE UPLOAD ENDPOINTS
+# ============================================================================
+
+from fastapi import UploadFile, File
+from fastapi.responses import FileResponse
+import shutil
+
+@app.post("/api/upload")
+async def upload_file(file: UploadFile = File(...)):
+    """Upload file for processing"""
+    try:
+        # Create uploads directory if it doesn't exist
+        upload_dir = "/app/uploads"
+        os.makedirs(upload_dir, exist_ok=True)
+        
+        # Generate unique filename
+        file_id = str(uuid.uuid4())
+        file_extension = os.path.splitext(file.filename)[1]
+        unique_filename = f"{file_id}{file_extension}"
+        file_path = os.path.join(upload_dir, unique_filename)
+        
+        # Save file
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        
+        # Store file metadata
+        file_metadata = {
+            "id": file_id,
+            "original_name": file.filename,
+            "filename": unique_filename,
+            "path": file_path,
+            "size": os.path.getsize(file_path),
+            "content_type": file.content_type,
+            "uploaded_at": datetime.utcnow().isoformat()
+        }
+        
+        upload_files_db.append(file_metadata)
+        
+        return {
+            "message": "File uploaded successfully",
+            "file": file_metadata
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
+
+@app.get("/api/upload/{file_id}")
+async def get_uploaded_file(file_id: str):
+    """Get uploaded file by ID"""
+    file_metadata = next((f for f in upload_files_db if f["id"] == file_id), None)
+    if not file_metadata:
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    return FileResponse(
+        file_metadata["path"],
+        filename=file_metadata["original_name"],
+        media_type=file_metadata["content_type"]
+    )
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
