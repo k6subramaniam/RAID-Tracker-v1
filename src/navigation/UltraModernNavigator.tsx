@@ -179,10 +179,9 @@ const UltraModernNavigator: React.FC = () => {
         />
         <Stack.Screen
           name="CreateItem"
-          component={CreateItemScreen}
+          component={UltraModernCreateItemScreen}
           options={{ 
-            title: 'New RAID Item',
-            headerShown: true,
+            headerShown: false, // Ultra-modern screen handles its own header
           }}
         />
         <Stack.Screen
