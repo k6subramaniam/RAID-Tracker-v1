@@ -47,6 +47,7 @@ const UltraModernRAIDListScreen: React.FC = () => {
   const [sortMenuVisible, setSortMenuVisible] = useState(false);
   const [fabOpen, setFabOpen] = useState(false);
   const [showDashboard, setShowDashboard] = useState(true);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   // Get filtered and sorted items
   const items = useMemo(() => {
