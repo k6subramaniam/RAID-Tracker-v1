@@ -90,7 +90,9 @@ const UltraModernRAIDListScreen: React.FC = () => {
     }
   };
 
-  const toggleQuickFilter = (
+  const handleSearch = (text: string) => {
+    setFilters({ searchText: text });
+  };
     filterName: 'dueSoon' | 'overdue' | 'recentlyUpdated' | 'aiFlagged'
   ) => {
     setFilters({ [filterName]: !filters[filterName] });
