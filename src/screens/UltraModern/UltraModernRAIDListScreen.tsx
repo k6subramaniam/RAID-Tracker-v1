@@ -120,7 +120,10 @@ const UltraModernRAIDListScreen: React.FC = () => {
       {showDashboard && <DashboardStats />}
 
       {/* AI Analysis Card */}
-      <AIAnalysisCard />
+      <AIAnalysisCard 
+        onAnalyze={handleAnalyzeText}
+        isAnalyzing={isAnalyzing}
+      />
 
       {/* Search and Filters */}
       <View style={[styles.searchSection, ultraModernStyles.ultraCard, { backgroundColor: theme.colors.surface }]}>
