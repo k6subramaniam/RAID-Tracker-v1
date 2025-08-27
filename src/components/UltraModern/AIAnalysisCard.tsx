@@ -52,8 +52,14 @@ const AIAnalysisCard: React.FC<AIAnalysisCardProps> = ({
   };
 
   const handleAnalyze = async () => {
-    if (onAnalyze && inputText.trim()) {
-      await onAnalyze(inputText);
+    if (onAnalyze && inputText.trim() && selectedProviders.length > 0) {
+      try {
+        const result = await apiService.analyzeText(inputText, selectedProviders);
+        setAnalysisResults(result.results);
+        await onAnalyze(inputText, selectedProviders);
+      } catch (error) {
+        console.error('Analysis failed:', error);
+      }
     }
   };
 
