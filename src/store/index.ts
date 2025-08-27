@@ -102,6 +102,9 @@ export const useStore = create<AppState>()(
     (set, get) => ({
       // Initial state
       items: [],
+      isLoading: false,
+      error: null,
+      dashboardStats: null,
       filters: defaultFilterState,
       workstreams: DEFAULT_WORKSTREAMS,
       owners: DEFAULT_OWNERS,
