@@ -156,11 +156,7 @@ const AIAnalysisCard: React.FC<AIAnalysisCardProps> = ({
           AI Providers
         </Text>
         <View style={styles.providerGrid}>
-          {[
-            { id: 'openai', name: 'OpenAI GPT-4o', icon: '🤖', status: 'active' },
-            { id: 'claude', name: 'Claude 3.5 Sonnet', icon: '🧠', status: 'active' },
-            { id: 'gemini', name: 'Gemini Pro', icon: '💎', status: 'active' },
-          ].map((provider) => (
+          {availableProviders.map((provider) => (
             <Pressable
               key={provider.id}
               style={[
@@ -177,7 +173,10 @@ const AIAnalysisCard: React.FC<AIAnalysisCardProps> = ({
               ]}
               onPress={() => toggleProvider(provider.id)}
             >
-              <Text style={{ fontSize: 16 }}>{provider.icon}</Text>
+              <Text style={{ fontSize: 16 }}>
+                {provider.provider === 'openai' ? '🤖' : 
+                 provider.provider === 'anthropic' ? '🧠' : '💎'}
+              </Text>
               <Text 
                 variant="labelMedium" 
                 style={{ 
@@ -191,7 +190,7 @@ const AIAnalysisCard: React.FC<AIAnalysisCardProps> = ({
               <View 
                 style={[
                   styles.statusDot, 
-                  { backgroundColor: theme.colors.success }
+                  { backgroundColor: provider.status === 'active' ? theme.colors.success : theme.colors.error }
                 ]} 
               />
             </Pressable>
