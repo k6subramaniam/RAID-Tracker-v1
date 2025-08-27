@@ -260,6 +260,26 @@ export const useStore = create<AppState>()(
         set({ draftItem: null });
       },
       
+      // Dashboard stats
+      loadDashboardStats: async () => {
+        try {
+          set({ isLoading: true, error: null });
+          const stats = await apiService.getDashboardStats();
+          set({ dashboardStats: stats, isLoading: false });
+        } catch (error) {
+          set({ error: error instanceof Error ? error.message : 'Failed to load dashboard stats', isLoading: false });
+        }
+      },
+      
+      // Error handling
+      setError: (error) => {
+        set({ error });
+      },
+      
+      setLoading: (loading) => {
+        set({ isLoading: loading });
+      },
+      
       // Initialization function
       initializeSampleData: () => {
         const state = get();
