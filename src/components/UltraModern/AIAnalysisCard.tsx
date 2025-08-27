@@ -34,6 +34,22 @@ const AIAnalysisCard: React.FC<AIAnalysisCardProps> = ({
   const theme = useTheme();
   const [inputText, setInputText] = useState('');
   const [selectedProviders, setSelectedProviders] = useState<string[]>(['openai', 'claude', 'gemini']);
+  const [analysisResults, setAnalysisResults] = useState<AIAnalysisResult[]>([]);
+  const [availableProviders, setAvailableProviders] = useState<any[]>([]);
+  
+  // Load available providers on mount
+  useEffect(() => {
+    loadProviders();
+  }, []);
+
+  const loadProviders = async () => {
+    try {
+      const data = await apiService.getAIProviders();
+      setAvailableProviders(data.providers || []);
+    } catch (error) {
+      console.error('Failed to load providers:', error);
+    }
+  };
 
   const handleAnalyze = async () => {
     if (onAnalyze && inputText.trim()) {
