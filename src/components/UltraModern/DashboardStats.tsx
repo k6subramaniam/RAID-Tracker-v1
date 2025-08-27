@@ -79,18 +79,52 @@ const StatCard: React.FC<StatCardProps> = ({
 
 const DashboardStats: React.FC = () => {
   const theme = useTheme();
-  const { items } = useStore();
+  const { items, dashboardStats, loadDashboardStats, isLoading } = useStore();
+  const [refreshing, setRefreshing] = useState(false);
 
-  // Calculate statistics
+  useEffect(() => {
+    loadDashboardStats();
+  }, [loadDashboardStats]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await loadDashboardStats();
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  // Use backend stats if available, otherwise calculate from local items
   const stats = React.useMemo(() => {
+    if (dashboardStats) {
+      return {
+        risks: {
+          total: dashboardStats.by_type?.Risk || 0,
+          open: dashboardStats.active_items || 0,
+        },
+        issues: {
+          total: dashboardStats.by_type?.Issue || 0,
+          open: dashboardStats.by_status?.Open || 0,
+        },
+        assumptions: {
+          total: dashboardStats.by_type?.Assumption || 0,
+          open: dashboardStats.by_status?.['In Progress'] || 0,
+        },
+        dependencies: {
+          total: dashboardStats.by_type?.Dependency || 0,
+          open: dashboardStats.active_items || 0,
+        },
+        overdue: dashboardStats.overdue || 0,
+        recentActivity: dashboardStats.recent_activity || 0,
+      };
+    }
+
+    // Fallback to local calculation
     const riskItems = items.filter(item => item.type === 'Risk');
     const issueItems = items.filter(item => item.type === 'Issue');
     const assumptionItems = items.filter(item => item.type === 'Assumption');
     const dependencyItems = items.filter(item => item.type === 'Dependency');
-
-    const openItems = items.filter(item => 
-      ['Open', 'In Progress', 'Mitigating'].includes(item.status)
-    );
 
     return {
       risks: {
@@ -109,8 +143,10 @@ const DashboardStats: React.FC = () => {
         total: dependencyItems.length,
         open: dependencyItems.filter(item => ['Open', 'In Progress'].includes(item.status)).length,
       },
+      overdue: 0,
+      recentActivity: 0,
     };
-  }, [items]);
+  }, [items, dashboardStats]);
 
   const statCards = [
     {
