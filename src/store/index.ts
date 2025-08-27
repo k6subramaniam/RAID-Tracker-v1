@@ -68,6 +68,13 @@ interface AppState {
   setDraftItem: (draft: Partial<RAIDItem> | null) => void;
   clearDraft: () => void;
   
+  // Dashboard stats
+  loadDashboardStats: () => Promise<void>;
+  
+  // Error handling
+  setError: (error: string | null) => void;
+  setLoading: (loading: boolean) => void;
+  
   // Initialization function to add sample data if store is empty
   initializeSampleData: () => void;
   getFilteredItems: () => RAIDItem[];
