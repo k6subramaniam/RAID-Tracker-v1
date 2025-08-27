@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { 
   Text, 
@@ -11,6 +11,7 @@ import {
 } from 'react-native-paper';
 import WebIcon from '../WebIcon';
 import { ultraModernStyles } from '../../theme/ultraModern';
+import { apiService } from '../../services/api';
 
 interface AIAnalysisCardProps {
   onAnalyze?: (text: string, providers: string[]) => Promise<void>;
