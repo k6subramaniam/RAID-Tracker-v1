@@ -59,6 +59,7 @@ interface AppState {
   // Draft management
   draftItem: Partial<RAIDItem> | null;
   setDraftItem: (draft: Partial<RAIDItem> | null) => void;
+  clearDraft: () => void;
   
   // Initialization function to add sample data if store is empty
   initializeSampleData: () => void;
