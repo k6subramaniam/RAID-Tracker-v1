@@ -113,59 +113,58 @@ export const useStore = create<AppState>()(
       themeMode: 'auto',
       draftItem: null,
       
-      // RAID Items actions
-      addItem: (item) => {
-        const id = generateId();
-        const now = new Date();
-        const newItem: RAIDItem = {
-          ...item,
-          id,
-          createdAt: now,
-          updatedAt: now,
-          history: [{
-            id: generateId(),
-            timestamp: now,
-            actor: 'User',
-            action: 'Created item',
-            note: 'Initial creation',
-          }],
-        };
-        set((state) => ({
-          items: [...state.items, newItem],
-        }));
-        return id;
+      // RAID Items actions (now connected to backend)
+      loadItems: async () => {
+        try {
+          set({ isLoading: true, error: null });
+          const response = await apiService.getRaidItems();
+          set({ items: response.items, isLoading: false });
+        } catch (error) {
+          set({ error: error instanceof Error ? error.message : 'Failed to load items', isLoading: false });
+        }
+      },
+
+      addItem: async (item) => {
+        try {
+          set({ isLoading: true, error: null });
+          const newItem = await apiService.createRaidItem(item);
+          set((state) => ({
+            items: [...state.items, newItem],
+            isLoading: false
+          }));
+          return newItem.id;
+        } catch (error) {
+          set({ error: error instanceof Error ? error.message : 'Failed to add item', isLoading: false });
+          throw error;
+        }
       },
       
-      updateItem: (id, updates) => {
-        const now = new Date();
-        set((state) => ({
-          items: state.items.map((item) => {
-            if (item.id === id) {
-              const historyEntry: HistoryEntry = {
-                id: generateId(),
-                timestamp: now,
-                actor: 'User',
-                action: 'Updated item',
-                previousValue: item,
-                newValue: updates,
-                note: `Updated fields: ${Object.keys(updates).join(', ')}`,
-              };
-              return {
-                ...item,
-                ...updates,
-                updatedAt: now,
-                history: [...item.history, historyEntry],
-              };
-            }
-            return item;
-          }),
-        }));
+      updateItem: async (id, updates) => {
+        try {
+          set({ isLoading: true, error: null });
+          const updatedItem = await apiService.updateRaidItem(id, updates);
+          set((state) => ({
+            items: state.items.map((item) => item.id === id ? updatedItem : item),
+            isLoading: false
+          }));
+        } catch (error) {
+          set({ error: error instanceof Error ? error.message : 'Failed to update item', isLoading: false });
+          throw error;
+        }
       },
       
-      deleteItem: (id) => {
-        set((state) => ({
-          items: state.items.filter((item) => item.id !== id),
-        }));
+      deleteItem: async (id) => {
+        try {
+          set({ isLoading: true, error: null });
+          await apiService.deleteRaidItem(id);
+          set((state) => ({
+            items: state.items.filter((item) => item.id !== id),
+            isLoading: false
+          }));
+        } catch (error) {
+          set({ error: error instanceof Error ? error.message : 'Failed to delete item', isLoading: false });
+          throw error;
+        }
       },
       
       // Filters actions
