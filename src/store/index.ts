@@ -240,6 +240,10 @@ export const useStore = create<AppState>()(
         set({ draftItem: draft });
       },
       
+      clearDraft: () => {
+        set({ draftItem: null });
+      },
+      
       // Initialization function
       initializeSampleData: () => {
         const state = get();
