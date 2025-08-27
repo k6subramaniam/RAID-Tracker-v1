@@ -168,6 +168,10 @@ export const useStore = create<AppState>()(
         }
       },
       
+      getItemById: (id) => {
+        return get().items.find(item => item.id === id);
+      },
+      
       // Filters actions
       setFilters: (filters) => {
         set((state) => ({
