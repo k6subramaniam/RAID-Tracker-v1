@@ -13,9 +13,17 @@ import WebIcon from '../WebIcon';
 import { ultraModernStyles } from '../../theme/ultraModern';
 
 interface AIAnalysisCardProps {
-  onAnalyze?: (text: string) => Promise<void>;
+  onAnalyze?: (text: string, providers: string[]) => Promise<void>;
   isAnalyzing?: boolean;
   results?: any[];
+}
+
+interface AIAnalysisResult {
+  provider: string;
+  model: string;
+  analysis: any;
+  confidence: number;
+  processing_time: number;
 }
 
 const AIAnalysisCard: React.FC<AIAnalysisCardProps> = ({
