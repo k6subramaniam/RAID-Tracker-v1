@@ -240,14 +240,12 @@ export const generateExecutiveSummary = (items: any[]): string => {
   return summary;
 };
 
-// Debounce function
-export const debounce = <T extends (...args: any[]) => any>(
-  func: T,
-  wait: number
-): ((...args: Parameters<T>) => void) => {
-  let timeout: NodeJS.Timeout;
-  return (...args: Parameters<T>) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
-  };
+export const calculateSeverityScore = (impact: string, likelihood: string): number => {
+  const impactScore = { 'Low': 1, 'Medium': 2, 'High': 3, 'Critical': 4 };
+  const likelihoodScore = { 'Low': 1, 'Medium': 2, 'High': 3 };
+  
+  const impactValue = impactScore[impact as keyof typeof impactScore] || 2;
+  const likelihoodValue = likelihoodScore[likelihood as keyof typeof likelihoodScore] || 2;
+  
+  return impactValue * likelihoodValue;
 };
