@@ -7,9 +7,9 @@ import { useTheme } from 'react-native-paper';
 // Import ultra-modern screens
 import UltraModernRAIDListScreen from '../screens/UltraModern/UltraModernRAIDListScreen';
 import UltraModernAIConfigScreen from '../screens/UltraModern/UltraModernAIConfigScreen';
+import UltraModernItemDetailScreen from '../screens/UltraModern/UltraModernItemDetailScreen';
 
 // Import existing screens that haven't been converted yet
-import ItemDetailScreen from '../screens/ItemDetailScreen';
 import CreateItemScreen from '../screens/CreateItemScreen';
 import CalculatorScreen from '../screens/CalculatorScreen';
 import GovernanceScreen from '../screens/GovernanceScreen';
