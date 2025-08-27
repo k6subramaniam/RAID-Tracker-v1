@@ -190,12 +190,30 @@ const DashboardStats: React.FC = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text variant="headlineSmall" style={[styles.title, { color: theme.colors.onSurface }]}>
-          RAID Dashboard
-        </Text>
-        <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-          Real-time overview of your project risks, assumptions, issues, and dependencies
-        </Text>
+        <View>
+          <Text variant="headlineSmall" style={[styles.title, { color: theme.colors.onSurface }]}>
+            RAID Dashboard
+          </Text>
+          <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+            Real-time overview of your project risks, assumptions, issues, and dependencies
+          </Text>
+        </View>
+        
+        <Pressable 
+          style={[
+            styles.refreshButton,
+            refreshing && { opacity: 0.6 },
+            { backgroundColor: theme.colors.surfaceVariant }
+          ]}
+          onPress={handleRefresh}
+          disabled={refreshing || isLoading}
+        >
+          <WebIcon 
+            name={refreshing ? "loading" : "refresh"} 
+            size={20} 
+            color={theme.colors.onSurface} 
+          />
+        </Pressable>
       </View>
 
       <View style={styles.statsGrid}>
