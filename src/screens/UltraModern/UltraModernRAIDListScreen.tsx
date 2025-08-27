@@ -93,12 +93,14 @@ const UltraModernRAIDListScreen: React.FC = () => {
   const handleSearch = (text: string) => {
     setFilters({ searchText: text });
   };
+
+  const toggleQuickFilter = (
     filterName: 'dueSoon' | 'overdue' | 'recentlyUpdated' | 'aiFlagged'
   ) => {
     setFilters({ [filterName]: !filters[filterName] });
   };
 
-  const toggleQuickFilter = (
+  const activeFilterCount = useMemo(() => {
     let count = 0;
     if (filters.types.length > 0) count += filters.types.length;
     if (filters.statuses.length > 0) count += filters.statuses.length;
