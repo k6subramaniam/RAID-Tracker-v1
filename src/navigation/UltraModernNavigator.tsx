@@ -172,10 +172,9 @@ const UltraModernNavigator: React.FC = () => {
         />
         <Stack.Screen
           name="ItemDetail"
-          component={ItemDetailScreen}
+          component={UltraModernItemDetailScreen}
           options={{ 
-            title: 'Item Details',
-            headerShown: true,
+            headerShown: false, // Ultra-modern screen handles its own header
           }}
         />
         <Stack.Screen
