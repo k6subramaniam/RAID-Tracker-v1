@@ -234,6 +234,37 @@ const AIAnalysisCard: React.FC<AIAnalysisCardProps> = ({
           </Text>
         </View>
       )}
+
+      {/* Analysis Results */}
+      {analysisResults.length > 0 && (
+        <View style={styles.resultsSection}>
+          <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onSurface }]}>
+            📊 Analysis Results
+          </Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View style={styles.resultsGrid}>
+              {analysisResults.map((result, index) => (
+                <View key={index} style={[styles.resultCard, { backgroundColor: theme.colors.surfaceVariant }]}>
+                  <View style={styles.resultHeader}>
+                    <Text variant="titleSmall" style={{ color: theme.colors.onSurface }}>
+                      {result.provider.charAt(0).toUpperCase() + result.provider.slice(1)}
+                    </Text>
+                    <Text variant="bodySmall" style={{ color: theme.colors.primary }}>
+                      {Math.round(result.confidence * 100)}% confidence
+                    </Text>
+                  </View>
+                  <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, marginBottom: 8 }}>
+                    Model: {result.model}
+                  </Text>
+                  <Text variant="bodySmall" style={{ color: theme.colors.onSurface }}>
+                    Processing time: {result.processing_time}ms
+                  </Text>
+                </View>
+              ))}
+            </View>
+          </ScrollView>
+        </View>
+      )}
     </View>
   );
 };
