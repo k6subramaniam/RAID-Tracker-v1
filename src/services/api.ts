@@ -8,7 +8,7 @@ const getApiBaseUrl = (): string => {
     return 'http://localhost:8001/api';
   }
   // For production, use environment variable or default
-  return process.env.REACT_APP_API_URL || 'http://localhost:8001/api';
+  return process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001/api';
 };
 
 const API_BASE_URL = getApiBaseUrl();
@@ -74,6 +74,34 @@ interface ValidationResponse {
   model_info?: any;
 }
 
+// RAID Item Interfaces
+interface RAIDItemsResponse {
+  items: RAIDItem[];
+  total: number;
+}
+
+interface DashboardStats {
+  total: number;
+  by_type: Record<string, number>;
+  by_status: Record<string, number>;
+  by_priority: Record<string, number>;
+  recent_activity: number;
+  overdue: number;
+  active_items: number;
+}
+
+interface FileUploadResponse {
+  message: string;
+  file: {
+    id: string;
+    original_name: string;
+    filename: string;
+    size: number;
+    content_type: string;
+    uploaded_at: string;
+  };
+}
+
 class APIService {
   private baseUrl = API_BASE_URL;
 
@@ -84,6 +112,146 @@ class APIService {
       return await response.json();
     } catch (error) {
       throw new Error(`Health check failed: ${error}`);
+    }
+  }
+
+  // ============================================================================
+  // RAID ITEMS API
+  // ============================================================================
+
+  async getRaidItems(): Promise<RAIDItemsResponse> {
+    try {
+      const response = await fetch(`${this.baseUrl}/raid-items`);
+      if (!response.ok) {
+        throw new Error(`Failed to get RAID items: ${response.statusText}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Get RAID items error:', error);
+      throw error;
+    }
+  }
+
+  async getRaidItem(itemId: string): Promise<RAIDItem> {
+    try {
+      const response = await fetch(`${this.baseUrl}/raid-items/${itemId}`);
+      if (!response.ok) {
+        throw new Error(`Failed to get RAID item: ${response.statusText}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Get RAID item error:', error);
+      throw error;
+    }
+  }
+
+  async createRaidItem(itemData: Omit<RAIDItem, 'id' | 'createdAt' | 'updatedAt' | 'history' | 'severityScore' | 'ai' | 'attachments'>): Promise<RAIDItem> {
+    try {
+      const response = await fetch(`${this.baseUrl}/raid-items`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(itemData),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to create RAID item: ${response.statusText}`);
+      }
+      
+      const result = await response.json();
+      return result.item;
+    } catch (error) {
+      console.error('Create RAID item error:', error);
+      throw error;
+    }
+  }
+
+  async updateRaidItem(itemId: string, updates: Partial<RAIDItem>): Promise<RAIDItem> {
+    try {
+      const response = await fetch(`${this.baseUrl}/raid-items/${itemId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updates),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to update RAID item: ${response.statusText}`);
+      }
+      
+      const result = await response.json();
+      return result.item;
+    } catch (error) {
+      console.error('Update RAID item error:', error);
+      throw error;
+    }
+  }
+
+  async deleteRaidItem(itemId: string): Promise<void> {
+    try {
+      const response = await fetch(`${this.baseUrl}/raid-items/${itemId}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to delete RAID item: ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error('Delete RAID item error:', error);
+      throw error;
+    }
+  }
+
+  async getDashboardStats(): Promise<DashboardStats> {
+    try {
+      const response = await fetch(`${this.baseUrl}/raid-items/stats/dashboard`);
+      if (!response.ok) {
+        throw new Error(`Failed to get dashboard stats: ${response.statusText}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Get dashboard stats error:', error);
+      throw error;
+    }
+  }
+
+  // ============================================================================
+  // FILE UPLOAD API
+  // ============================================================================
+
+  async uploadFile(file: File): Promise<FileUploadResponse> {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch(`${this.baseUrl}/upload`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to upload file: ${response.statusText}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('File upload error:', error);
+      throw error;
+    }
+  }
+
+  async getUploadedFile(fileId: string): Promise<Blob> {
+    try {
+      const response = await fetch(`${this.baseUrl}/upload/${fileId}`);
+      if (!response.ok) {
+        throw new Error(`Failed to get uploaded file: ${response.statusText}`);
+      }
+      return await response.blob();
+    } catch (error) {
+      console.error('Get uploaded file error:', error);
+      throw error;
     }
   }
 
