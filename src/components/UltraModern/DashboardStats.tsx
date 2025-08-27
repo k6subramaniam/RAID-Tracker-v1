@@ -264,7 +264,18 @@ const styles = StyleSheet.create({
     gap: ultraModernStyles.spacing.lg,
   },
   header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
     marginBottom: ultraModernStyles.spacing.md,
+  },
+  refreshButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 4,
   },
   title: {
     fontWeight: '700',
