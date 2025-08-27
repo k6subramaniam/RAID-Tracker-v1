@@ -22,9 +22,15 @@ import { generateId, calculateSeverityScore } from '../utils/helpers';
 interface AppState {
   // RAID Items
   items: RAIDItem[];
-  addItem: (item: Omit<RAIDItem, 'id' | 'createdAt' | 'updatedAt' | 'history'>) => string;
-  updateItem: (id: string, updates: Partial<RAIDItem>) => void;
-  deleteItem: (id: string) => void;
+  isLoading: boolean;
+  error: string | null;
+  dashboardStats: any;
+  
+  // RAID Items actions (now connected to backend)
+  loadItems: () => Promise<void>;
+  addItem: (item: Omit<RAIDItem, 'id' | 'createdAt' | 'updatedAt' | 'history' | 'severityScore' | 'ai' | 'attachments'>) => Promise<string>;
+  updateItem: (id: string, updates: Partial<RAIDItem>) => Promise<void>;
+  deleteItem: (id: string) => Promise<void>;
   
   // Filters
   filters: FilterState;
