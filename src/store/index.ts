@@ -16,7 +16,8 @@ import {
   DEFAULT_AI_CONFIG,
   SAMPLE_RAID_ITEMS 
 } from '../constants';
-import { generateId } from '../utils/helpers';
+import { apiService } from '../services/api';
+import { generateId, calculateSeverityScore } from '../utils/helpers';
 
 interface AppState {
   // RAID Items
