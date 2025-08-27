@@ -23,6 +23,7 @@ import WebIcon from '../../components/WebIcon';
 import { useStore } from '../../store';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import { ultraModernStyles } from '../../theme/ultraModern';
+import { apiService } from '../../services/api';
 import { 
   sortByPriority, 
   sortBySeverity, 
