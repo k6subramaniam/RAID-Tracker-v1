@@ -249,3 +249,7 @@ export const calculateSeverityScore = (impact: string, likelihood: string): numb
   
   return impactValue * likelihoodValue;
 };
+
+export const generateId = (): string => {
+  return Math.random().toString(36).substring(2) + Date.now().toString(36);
+};
