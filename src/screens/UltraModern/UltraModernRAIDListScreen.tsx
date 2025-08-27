@@ -76,8 +76,18 @@ const UltraModernRAIDListScreen: React.FC = () => {
     navigation.navigate('CreateItem', { type });
   };
 
-  const handleSearch = (text: string) => {
-    setFilters({ searchText: text });
+  const handleAnalyzeText = async (text: string, providers: string[]) => {
+    setIsAnalyzing(true);
+    try {
+      const result = await apiService.analyzeText(text, providers);
+      console.log('Analysis result:', result);
+      // Here you could create RAID items from the analysis results
+      // For now, just log the results
+    } catch (error) {
+      console.error('Analysis failed:', error);
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const toggleQuickFilter = (
