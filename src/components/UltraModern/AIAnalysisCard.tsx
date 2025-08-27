@@ -375,6 +375,26 @@ const styles = StyleSheet.create({
     height: 4,
     borderRadius: 2,
   },
+  resultsSection: {
+    marginTop: ultraModernStyles.spacing.lg,
+  },
+  resultsGrid: {
+    flexDirection: 'row',
+    gap: ultraModernStyles.spacing.md,
+  },
+  resultCard: {
+    width: 250,
+    padding: ultraModernStyles.spacing.md,
+    borderRadius: ultraModernStyles.radius.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  resultHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: ultraModernStyles.spacing.sm,
+  },
 });
 
 export default AIAnalysisCard;
