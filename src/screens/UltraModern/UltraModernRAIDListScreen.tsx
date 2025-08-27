@@ -98,7 +98,7 @@ const UltraModernRAIDListScreen: React.FC = () => {
     setFilters({ [filterName]: !filters[filterName] });
   };
 
-  const activeFilterCount = useMemo(() => {
+  const toggleQuickFilter = (
     let count = 0;
     if (filters.types.length > 0) count += filters.types.length;
     if (filters.statuses.length > 0) count += filters.statuses.length;
