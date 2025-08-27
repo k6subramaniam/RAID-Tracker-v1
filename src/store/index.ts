@@ -31,6 +31,7 @@ interface AppState {
   addItem: (item: Omit<RAIDItem, 'id' | 'createdAt' | 'updatedAt' | 'history' | 'severityScore' | 'ai' | 'attachments'>) => Promise<string>;
   updateItem: (id: string, updates: Partial<RAIDItem>) => Promise<void>;
   deleteItem: (id: string) => Promise<void>;
+  getItemById: (id: string) => RAIDItem | undefined;
   
   // Filters
   filters: FilterState;
