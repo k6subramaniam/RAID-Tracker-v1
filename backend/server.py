@@ -1,6 +1,8 @@
 import os
 import json
 import asyncio
+import uuid
+from datetime import datetime
 from typing import List, Dict, Any, Optional
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, BackgroundTasks
@@ -24,9 +26,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# In-memory storage (replace with database in production)
+raid_items_db = []
+ai_providers_db = []
+upload_files_db = []
+
 # Models
 class RAIDItem(BaseModel):
-    id: str
+    id: Optional[str] = None
     type: str  # Risk, Assumption, Issue, Dependency
     title: str
     description: str
@@ -34,9 +41,49 @@ class RAIDItem(BaseModel):
     priority: str
     impact: str  # Low, Medium, High, Critical
     likelihood: str  # Low, Medium, High
+    severityScore: Optional[int] = None
     workstream: str
     owner: str
     dueDate: Optional[str] = None
+    targetDate: Optional[str] = None
+    createdAt: Optional[str] = None
+    updatedAt: Optional[str] = None
+    history: Optional[List[Dict[str, Any]]] = []
+    ai: Optional[Dict[str, Any]] = None
+    attachments: Optional[List[str]] = []
+    governanceTags: Optional[List[str]] = []
+    references: Optional[List[str]] = []
+
+class RAIDItemCreate(BaseModel):
+    type: str
+    title: str
+    description: str
+    status: str = "Open"
+    priority: str = "P2"
+    impact: str = "Medium"
+    likelihood: str = "Medium"
+    workstream: str
+    owner: str
+    dueDate: Optional[str] = None
+    targetDate: Optional[str] = None
+    governanceTags: Optional[List[str]] = []
+    references: Optional[List[str]] = []
+
+class RAIDItemUpdate(BaseModel):
+    type: Optional[str] = None
+    title: Optional[str] = None
+    description: Optional[str] = None
+    status: Optional[str] = None
+    priority: Optional[str] = None
+    impact: Optional[str] = None
+    likelihood: Optional[str] = None
+    workstream: Optional[str] = None
+    owner: Optional[str] = None
+    dueDate: Optional[str] = None
+    targetDate: Optional[str] = None
+    governanceTags: Optional[List[str]] = None
+    references: Optional[List[str]] = None
+    ai: Optional[Dict[str, Any]] = None
 
 class AIProvider(BaseModel):
     id: str
