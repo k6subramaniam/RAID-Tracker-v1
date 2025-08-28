@@ -39,6 +39,7 @@ const Layout: React.FC<LayoutProps> = ({
             title={title}
             subtitle={subtitle}
             showBackButton={showBackButton}
+            onBackPress={onBackPress}
             rightActions={rightActions}
           />
           
