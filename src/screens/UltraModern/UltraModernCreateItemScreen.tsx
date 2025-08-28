@@ -156,6 +156,11 @@ const UltraModernCreateItemScreen: React.FC = () => {
   };
 
   const handleNext = () => {
+    if (!validateCurrentStep()) {
+      Alert.alert('Validation Error', 'Please fix the errors before proceeding.');
+      return;
+    }
+    
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     }
@@ -168,22 +173,30 @@ const UltraModernCreateItemScreen: React.FC = () => {
   };
 
   const handleCreate = async () => {
+    if (!validateCurrentStep()) {
+      Alert.alert('Validation Error', 'Please fix all errors before creating the item.');
+      return;
+    }
+
     setIsCreating(true);
     try {
-      const severityScore = calculateSeverityScore(formData.impact, formData.likelihood);
-      
-      const newItem: Omit<RAIDItem, 'id' | 'createdAt' | 'updatedAt' | 'history'> = {
-        ...formData,
-        severityScore,
-        attachments: [],
-      };
-      
-      const itemId = addItem(newItem);
+      const itemId = await addItem(formData);
       setDraftItem(null); // Clear draft
+      setHasUnsavedChanges(false);
       
-      navigation.navigate('ItemDetail', { itemId });
+      Alert.alert(
+        'Success', 
+        'RAID item created successfully!',
+        [
+          {
+            text: 'View Item',
+            onPress: () => navigation.navigate('ItemDetail', { itemId })
+          }
+        ]
+      );
     } catch (error) {
       console.error('Failed to create item:', error);
+      Alert.alert('Error', 'Failed to create RAID item. Please try again.');
     } finally {
       setIsCreating(false);
     }
@@ -191,12 +204,44 @@ const UltraModernCreateItemScreen: React.FC = () => {
 
   const canProceed = () => {
     switch (currentStep) {
-      case 0: return formData.type && formData.title.trim();
-      case 1: return formData.description.trim();
-      case 2: return formData.impact && formData.likelihood;
+      case 0: return formData.type && formData.title.trim().length >= 3;
+      case 1: return formData.description.trim().length >= 10;
+      case 2: return formData.impact && formData.likelihood && formData.priority;
       case 3: return formData.workstream && formData.owner;
       case 4: return true;
       default: return false;
+    }
+  };
+
+  const handleBackNavigation = () => {
+    if (hasUnsavedChanges) {
+      Alert.alert(
+        'Unsaved Changes',
+        'You have unsaved changes. Do you want to save as draft or discard?',
+        [
+          {
+            text: 'Discard',
+            style: 'destructive',
+            onPress: () => {
+              setDraftItem(null);
+              navigation.goBack();
+            }
+          },
+          {
+            text: 'Save Draft',
+            onPress: () => {
+              setDraftItem(formData);
+              navigation.goBack();
+            }
+          },
+          {
+            text: 'Cancel',
+            style: 'cancel'
+          }
+        ]
+      );
+    } else {
+      navigation.goBack();
     }
   };
 
