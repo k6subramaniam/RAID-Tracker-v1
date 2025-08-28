@@ -402,7 +402,19 @@ const UltraModernRAIDListScreen: React.FC = () => {
         ListEmptyComponent={renderEmptyState}
         contentContainerStyle={items.length === 0 ? styles.emptyListContainer : styles.listContainer}
         showsVerticalScrollIndicator={false}
+        refreshing={refreshing}
+        onRefresh={handleRefresh}
       />
+
+      {/* Loading Overlay */}
+      {isLoading && !refreshing && (
+        <View style={[styles.loadingOverlay, { backgroundColor: theme.colors.background + '90' }]}>
+          <ProgressBar indeterminate color={theme.colors.primary} />
+          <Text variant="bodyMedium" style={{ color: theme.colors.onSurface, textAlign: 'center', marginTop: 16 }}>
+            Loading RAID items...
+          </Text>
+        </View>
+      )}
 
       {/* Floating Action Button */}
       <Portal>
