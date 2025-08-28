@@ -951,6 +951,80 @@ const styles = StyleSheet.create({
     padding: ultraModernStyles.spacing.xl,
     gap: ultraModernStyles.spacing.md,
   },
+  headerActions: {
+    flexDirection: 'row',
+    gap: ultraModernStyles.spacing.sm,
+  },
+  editModal: {
+    margin: ultraModernStyles.spacing.lg,
+    padding: ultraModernStyles.spacing.xl,
+    maxHeight: '90%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: ultraModernStyles.spacing.lg,
+  },
+  modalBody: {
+    maxHeight: 500,
+  },
+  formSection: {
+    marginBottom: ultraModernStyles.spacing.xl,
+  },
+  formSectionTitle: {
+    fontWeight: '600',
+    marginBottom: ultraModernStyles.spacing.md,
+  },
+  formGroup: {
+    marginBottom: ultraModernStyles.spacing.md,
+  },
+  formRow: {
+    flexDirection: 'row',
+    gap: ultraModernStyles.spacing.md,
+    marginBottom: ultraModernStyles.spacing.md,
+  },
+  formLabel: {
+    fontSize: 12,
+    fontWeight: '500',
+    marginBottom: ultraModernStyles.spacing.sm,
+  },
+  segmentedButtons: {
+    marginBottom: ultraModernStyles.spacing.sm,
+  },
+  severityDisplay: {
+    alignItems: 'center',
+    padding: ultraModernStyles.spacing.lg,
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    borderRadius: ultraModernStyles.radius.lg,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    gap: ultraModernStyles.spacing.md,
+    marginTop: ultraModernStyles.spacing.lg,
+  },
+  deleteModal: {
+    margin: ultraModernStyles.spacing.xl,
+    padding: ultraModernStyles.spacing.xl,
+    alignItems: 'center',
+  },
+  deleteContent: {
+    alignItems: 'center',
+    gap: ultraModernStyles.spacing.lg,
+  },
+  deleteTitle: {
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  deleteMessage: {
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  deleteActions: {
+    flexDirection: 'row',
+    gap: ultraModernStyles.spacing.md,
+    width: '100%',
+  },
 });
 
 export default UltraModernItemDetailScreen;
