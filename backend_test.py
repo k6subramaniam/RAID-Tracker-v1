@@ -879,8 +879,27 @@ class BackendAPITester:
         self.test_analyze_text()
         self.test_delete_provider()
         
-        # Cleanup
+        # Cleanup AI providers
         self.cleanup_test_providers()
+        
+        print("\n" + "🔧" * 60)
+        print("🎯 RAID ITEM MANAGEMENT SYSTEM TESTING")
+        print("🔧" * 60)
+        
+        # RAID Items CRUD Testing - As requested in review
+        self.test_get_all_raid_items()  # 1. GET /api/raid-items - Should return empty list initially
+        self.test_get_dashboard_stats()  # 2. GET /api/raid-items/stats/dashboard - Should return statistics (zeros initially)
+        self.test_create_raid_item()  # 3. POST /api/raid-items - Create new item with specified data
+        self.test_get_raid_item_by_id()  # 4. GET /api/raid-items/{id} - Get the created item by ID
+        self.test_update_raid_item()  # 5. PUT /api/raid-items/{id} - Update the item status to "In Progress"
+        self.test_get_dashboard_stats()  # 6. GET /api/raid-items/stats/dashboard - Should now show 1 risk item
+        self.test_create_second_raid_item()  # 7. POST /api/raid-items - Create another item (Issue type)
+        self.test_get_all_raid_items()  # 8. GET /api/raid-items - Should return both items
+        self.test_file_upload()  # 11. POST /api/upload - Test with a small text file
+        self.test_delete_raid_item()  # 9. DELETE /api/raid-items/{id} - Delete one item
+        
+        # Cleanup RAID items
+        self.cleanup_test_raid_items()
         
         # Summary
         print("\n" + "=" * 60)
