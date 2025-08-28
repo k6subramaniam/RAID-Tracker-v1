@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { View, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
 import { 
   Text, 
   useTheme, 
@@ -10,8 +10,9 @@ import {
   Portal,
   Modal,
   TextInput,
+  SegmentedButtons,
 } from 'react-native-paper';
-import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
+import { useRoute, useNavigation, RouteProp, useFocusEffect } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import Layout from '../../components/UltraModern/Layout';
@@ -20,8 +21,9 @@ import { useStore } from '../../store';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import { ultraModernStyles } from '../../theme/ultraModern';
 import { apiService } from '../../services/api';
-import { RAIDItem, HistoryEntry } from '../../types';
-import { formatDate } from '../../utils/helpers';
+import { RAIDItem, HistoryEntry, ItemStatus, Priority } from '../../types';
+import { formatDate, calculateSeverityScore } from '../../utils/helpers';
+import { validateRAIDItem, formatErrorMessage } from '../../utils/validation';
 
 type ItemDetailRouteProp = RouteProp<RootStackParamList, 'ItemDetail'>;
 type ItemDetailNavigationProp = StackNavigationProp<RootStackParamList, 'ItemDetail'>;
