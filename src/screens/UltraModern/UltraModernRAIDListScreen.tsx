@@ -11,7 +11,7 @@ import {
   Menu,
   Divider,
 } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import Layout from '../../components/UltraModern/Layout';
