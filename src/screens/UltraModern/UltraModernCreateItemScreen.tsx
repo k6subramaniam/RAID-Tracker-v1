@@ -828,6 +828,11 @@ const styles = StyleSheet.create({
     minHeight: 120,
     textAlignVertical: 'top',
   },
+  characterCount: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   divider: {
     marginVertical: ultraModernStyles.spacing.lg,
   },
