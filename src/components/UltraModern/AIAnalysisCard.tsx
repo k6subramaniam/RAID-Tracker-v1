@@ -420,6 +420,107 @@ const AIAnalysisCard: React.FC<AIAnalysisCardProps> = ({
           </ScrollView>
         </View>
       )}
+      
+      {/* Consensus Results Modal */}
+      <Portal>
+        <Modal
+          visible={consensusModalVisible}
+          onDismiss={() => setConsensusModalVisible(false)}
+          contentContainerStyle={[
+            styles.consensusModal,
+            ultraModernStyles.ultraCard,
+            { backgroundColor: theme.colors.surface }
+          ]}
+        >
+          <View style={styles.consensusHeader}>
+            <Text variant="headlineSmall" style={{ color: theme.colors.onSurface }}>
+              🤝 AI Consensus Results
+            </Text>
+            <Button
+              mode="text"
+              onPress={() => setConsensusModalVisible(false)}
+              icon="close"
+            >
+              Close
+            </Button>
+          </View>
+
+          {consensus && (
+            <ScrollView style={styles.consensusContent}>
+              <View style={styles.consensusScore}>
+                <Text variant="labelMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+                  Overall Confidence Score
+                </Text>
+                <Text variant="displaySmall" style={{ color: theme.colors.primary, fontWeight: '700' }}>
+                  {Math.round(consensus.confidence_score * 100)}%
+                </Text>
+              </View>
+
+              {/* RAID Items Found */}
+              {consensus.risks?.length > 0 && (
+                <View style={styles.consensusSection}>
+                  <Text variant="titleMedium" style={[styles.consensusSectionTitle, { color: theme.colors.risk }]}>
+                    ⚠️ Risks Identified ({consensus.risks.length})
+                  </Text>
+                  {consensus.risks.map((risk: string, index: number) => (
+                    <Text key={index} variant="bodyMedium" style={[styles.consensusItem, { color: theme.colors.onSurface }]}>
+                      • {risk}
+                    </Text>
+                  ))}
+                </View>
+              )}
+
+              {consensus.assumptions?.length > 0 && (
+                <View style={styles.consensusSection}>
+                  <Text variant="titleMedium" style={[styles.consensusSectionTitle, { color: theme.colors.assumption }]}>
+                    🤔 Assumptions Identified ({consensus.assumptions.length})
+                  </Text>
+                  {consensus.assumptions.map((assumption: string, index: number) => (
+                    <Text key={index} variant="bodyMedium" style={[styles.consensusItem, { color: theme.colors.onSurface }]}>
+                      • {assumption}
+                    </Text>
+                  ))}
+                </View>
+              )}
+
+              {consensus.issues?.length > 0 && (
+                <View style={styles.consensusSection}>
+                  <Text variant="titleMedium" style={[styles.consensusSectionTitle, { color: theme.colors.issue }]}>
+                    🔥 Issues Identified ({consensus.issues.length})
+                  </Text>
+                  {consensus.issues.map((issue: string, index: number) => (
+                    <Text key={index} variant="bodyMedium" style={[styles.consensusItem, { color: theme.colors.onSurface }]}>
+                      • {issue}
+                    </Text>
+                  ))}
+                </View>
+              )}
+
+              {consensus.dependencies?.length > 0 && (
+                <View style={styles.consensusSection}>
+                  <Text variant="titleMedium" style={[styles.consensusSectionTitle, { color: theme.colors.dependency }]}>
+                    🔗 Dependencies Identified ({consensus.dependencies.length})
+                  </Text>
+                  {consensus.dependencies.map((dependency: string, index: number) => (
+                    <Text key={index} variant="bodyMedium" style={[styles.consensusItem, { color: theme.colors.onSurface }]}>
+                      • {dependency}
+                    </Text>
+                  ))}
+                </View>
+              )}
+
+              <Button
+                mode="contained"
+                onPress={handleCreateRAIDItems}
+                style={[ultraModernStyles.primaryButton, { marginTop: ultraModernStyles.spacing.lg }]}
+                icon="plus-circle"
+              >
+                Create RAID Items from Results
+              </Button>
+            </ScrollView>
+          )}
+        </Modal>
+      </Portal>
     </View>
   );
 };
