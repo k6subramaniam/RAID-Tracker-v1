@@ -354,7 +354,14 @@ const UltraModernCreateItemScreen: React.FC = () => {
         onChangeText={(text) => updateFormData({ title: text })}
         placeholder={`Enter ${formData.type.toLowerCase()} title...`}
         style={ultraModernStyles.ultraInput}
+        error={!!validationErrors.title}
+        maxLength={200}
       />
+      {validationErrors.title && (
+        <Text variant="bodySmall" style={{ color: theme.colors.error, marginTop: 4 }}>
+          {validationErrors.title}
+        </Text>
+      )}
     </View>
   );
 
