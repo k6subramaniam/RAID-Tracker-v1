@@ -34,12 +34,77 @@ const UltraModernItemDetailScreen: React.FC = () => {
   const navigation = useNavigation<ItemDetailNavigationProp>();
   const { itemId } = route.params;
   
-  const { items, updateItem, deleteItem, workstreams, owners } = useStore();
+  const { 
+    items, 
+    updateItem, 
+    deleteItem, 
+    workstreams, 
+    owners, 
+    getItemById,
+    isLoading,
+    error,
+    setError 
+  } = useStore();
+  
   const [activeTab, setActiveTab] = useState<'overview' | 'ai' | 'history'>('overview');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
+  const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
+  const [item, setItem] = useState<RAIDItem | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
+  
+  // Edit form state
+  const [editForm, setEditForm] = useState({
+    title: '',
+    description: '',
+    status: '' as ItemStatus,
+    priority: '' as Priority,
+    impact: '',
+    likelihood: '',
+    dueDate: '',
+  });
 
-  const item = items.find(i => i.id === itemId);
+  // Load item data
+  useFocusEffect(
+    React.useCallback(() => {
+      loadItemData();
+    }, [itemId])
+  );
+
+  const loadItemData = async () => {
+    try {
+      // First try to get from local store
+      const localItem = getItemById(itemId);
+      if (localItem) {
+        setItem(localItem);
+        setEditForm({
+          title: localItem.title,
+          description: localItem.description,
+          status: localItem.status as ItemStatus,
+          priority: localItem.priority as Priority,
+          impact: localItem.impact,
+          likelihood: localItem.likelihood,
+          dueDate: localItem.dueDate || '',
+        });
+      } else {
+        // Fetch from backend if not in local store
+        const fetchedItem = await apiService.getRaidItem(itemId);
+        setItem(fetchedItem);
+        setEditForm({
+          title: fetchedItem.title,
+          description: fetchedItem.description,
+          status: fetchedItem.status as ItemStatus,
+          priority: fetchedItem.priority as Priority,
+          impact: fetchedItem.impact,
+          likelihood: fetchedItem.likelihood,
+          dueDate: fetchedItem.dueDate || '',
+        });
+      }
+    } catch (error) {
+      console.error('Failed to load item:', error);
+      setError('Failed to load RAID item');
+    }
+  };
   
   if (!item) {
     return (
