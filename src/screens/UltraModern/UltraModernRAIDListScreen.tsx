@@ -42,6 +42,10 @@ const UltraModernRAIDListScreen: React.FC = () => {
     filters,
     setFilters,
     resetFilters,
+    loadItems,
+    loadDashboardStats,
+    isLoading,
+    error,
   } = useStore();
 
   const [sortBy, setSortBy] = useState<SortOption>('priority');
@@ -49,6 +53,34 @@ const UltraModernRAIDListScreen: React.FC = () => {
   const [fabOpen, setFabOpen] = useState(false);
   const [showDashboard, setShowDashboard] = useState(true);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  // Load data on mount
+  useFocusEffect(
+    React.useCallback(() => {
+      loadInitialData();
+    }, [])
+  );
+
+  const loadInitialData = async () => {
+    try {
+      await Promise.all([
+        loadItems(),
+        loadDashboardStats()
+      ]);
+    } catch (error) {
+      console.error('Failed to load initial data:', error);
+    }
+  };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await loadInitialData();
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   // Get filtered and sorted items
   const items = useMemo(() => {
