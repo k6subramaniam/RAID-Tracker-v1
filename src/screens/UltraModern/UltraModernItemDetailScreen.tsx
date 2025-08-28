@@ -570,6 +570,209 @@ const UltraModernItemDetailScreen: React.FC = () => {
         {renderTabNavigation()}
         {renderContent()}
       </ScrollView>
+
+      {/* Edit Modal */}
+      <Portal>
+        <Modal
+          visible={editModalVisible}
+          onDismiss={() => setEditModalVisible(false)}
+          contentContainerStyle={[
+            styles.editModal,
+            ultraModernStyles.ultraCard,
+            { backgroundColor: theme.colors.surface }
+          ]}
+        >
+          <View style={styles.modalHeader}>
+            <Text variant="headlineSmall" style={{ color: theme.colors.onSurface }}>
+              ✏️ Edit RAID Item
+            </Text>
+            <Button
+              mode="text"
+              onPress={() => setEditModalVisible(false)}
+              icon="close"
+            >
+              Cancel
+            </Button>
+          </View>
+
+          <ScrollView style={styles.modalBody}>
+            <View style={styles.formSection}>
+              <Text variant="titleMedium" style={[styles.formSectionTitle, { color: theme.colors.onSurface }]}>
+                Basic Information
+              </Text>
+              
+              <View style={styles.formGroup}>
+                <Text variant="labelMedium" style={[styles.formLabel, { color: theme.colors.onSurfaceVariant }]}>
+                  Title *
+                </Text>
+                <TextInput
+                  mode="outlined"
+                  value={editForm.title}
+                  onChangeText={(text) => setEditForm(prev => ({ ...prev, title: text }))}
+                  style={ultraModernStyles.ultraInput}
+                />
+              </View>
+
+              <View style={styles.formGroup}>
+                <Text variant="labelMedium" style={[styles.formLabel, { color: theme.colors.onSurfaceVariant }]}>
+                  Description *
+                </Text>
+                <TextInput
+                  mode="outlined"
+                  multiline
+                  numberOfLines={4}
+                  value={editForm.description}
+                  onChangeText={(text) => setEditForm(prev => ({ ...prev, description: text }))}
+                  style={ultraModernStyles.ultraInput}
+                />
+              </View>
+            </View>
+
+            <View style={styles.formSection}>
+              <Text variant="titleMedium" style={[styles.formSectionTitle, { color: theme.colors.onSurface }]}>
+                Assessment
+              </Text>
+              
+              <View style={styles.formGroup}>
+                <Text variant="labelMedium" style={[styles.formLabel, { color: theme.colors.onSurfaceVariant }]}>
+                  Status
+                </Text>
+                <SegmentedButtons
+                  value={editForm.status}
+                  onValueChange={(value) => setEditForm(prev => ({ ...prev, status: value as ItemStatus }))}
+                  buttons={[
+                    { value: 'Open', label: 'Open' },
+                    { value: 'In Progress', label: 'In Progress' },
+                    { value: 'Resolved', label: 'Resolved' },
+                    { value: 'Closed', label: 'Closed' },
+                  ]}
+                  style={styles.segmentedButtons}
+                />
+              </View>
+
+              <View style={styles.formGroup}>
+                <Text variant="labelMedium" style={[styles.formLabel, { color: theme.colors.onSurfaceVariant }]}>
+                  Priority
+                </Text>
+                <SegmentedButtons
+                  value={editForm.priority}
+                  onValueChange={(value) => setEditForm(prev => ({ ...prev, priority: value as Priority }))}
+                  buttons={[
+                    { value: 'P0', label: 'P0' },
+                    { value: 'P1', label: 'P1' },
+                    { value: 'P2', label: 'P2' },
+                    { value: 'P3', label: 'P3' },
+                  ]}
+                  style={styles.segmentedButtons}
+                />
+              </View>
+
+              <View style={styles.formRow}>
+                <View style={[styles.formGroup, { flex: 1 }]}>
+                  <Text variant="labelMedium" style={[styles.formLabel, { color: theme.colors.onSurfaceVariant }]}>
+                    Impact
+                  </Text>
+                  <SegmentedButtons
+                    value={editForm.impact}
+                    onValueChange={(value) => setEditForm(prev => ({ ...prev, impact: value }))}
+                    buttons={[
+                      { value: 'Low', label: 'Low' },
+                      { value: 'Medium', label: 'Med' },
+                      { value: 'High', label: 'High' },
+                      { value: 'Critical', label: 'Crit' },
+                    ]}
+                    style={styles.segmentedButtons}
+                  />
+                </View>
+
+                <View style={[styles.formGroup, { flex: 1 }]}>
+                  <Text variant="labelMedium" style={[styles.formLabel, { color: theme.colors.onSurfaceVariant }]}>
+                    Likelihood
+                  </Text>
+                  <SegmentedButtons
+                    value={editForm.likelihood}
+                    onValueChange={(value) => setEditForm(prev => ({ ...prev, likelihood: value }))}
+                    buttons={[
+                      { value: 'Low', label: 'Low' },
+                      { value: 'Medium', label: 'Med' },
+                      { value: 'High', label: 'High' },
+                    ]}
+                    style={styles.segmentedButtons}
+                  />
+                </View>
+              </View>
+
+              <View style={styles.severityDisplay}>
+                <Text variant="labelMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+                  Calculated Severity Score
+                </Text>
+                <Text variant="displaySmall" style={{ color: theme.colors.primary, fontWeight: '700' }}>
+                  {calculateSeverityScore(editForm.impact, editForm.likelihood)}
+                </Text>
+              </View>
+            </View>
+          </ScrollView>
+
+          <View style={styles.modalActions}>
+            <Button
+              mode="contained-tonal"
+              onPress={() => setEditModalVisible(false)}
+              style={ultraModernStyles.secondaryButton}
+            >
+              Cancel
+            </Button>
+            <Button
+              mode="contained"
+              onPress={handleEditSave}
+              loading={isUpdating}
+              style={[ultraModernStyles.primaryButton, { flex: 1 }]}
+              icon="content-save"
+            >
+              {isUpdating ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </View>
+        </Modal>
+
+        {/* Delete Confirmation Modal */}
+        <Modal
+          visible={deleteConfirmVisible}
+          onDismiss={() => setDeleteConfirmVisible(false)}
+          contentContainerStyle={[
+            styles.deleteModal,
+            ultraModernStyles.ultraCard,
+            { backgroundColor: theme.colors.surface }
+          ]}
+        >
+          <View style={styles.deleteContent}>
+            <WebIcon name="alert-circle" size={64} color={theme.colors.error} />
+            <Text variant="headlineSmall" style={[styles.deleteTitle, { color: theme.colors.onSurface }]}>
+              Delete RAID Item?
+            </Text>
+            <Text variant="bodyMedium" style={[styles.deleteMessage, { color: theme.colors.onSurfaceVariant }]}>
+              This action cannot be undone. The item "{item?.title}" and all its history will be permanently deleted.
+            </Text>
+            
+            <View style={styles.deleteActions}>
+              <Button
+                mode="contained-tonal"
+                onPress={() => setDeleteConfirmVisible(false)}
+                style={[ultraModernStyles.secondaryButton, { flex: 1 }]}
+              >
+                Cancel
+              </Button>
+              <Button
+                mode="contained"
+                onPress={handleDelete}
+                style={[{ flex: 1, backgroundColor: theme.colors.error }]}
+                textColor={theme.colors.onError}
+                icon="delete"
+              >
+                Delete Item
+              </Button>
+            </View>
+          </div>
+        </Modal>
+      </Portal>
     </Layout>
   );
 };
