@@ -631,6 +631,74 @@ const styles = StyleSheet.create({
     height: 4,
     borderRadius: 2,
   },
+  analysisMethodSelector: {
+    marginBottom: ultraModernStyles.spacing.lg,
+  },
+  methodButtons: {
+    flexDirection: 'row',
+    gap: ultraModernStyles.spacing.md,
+    marginTop: ultraModernStyles.spacing.sm,
+  },
+  methodButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: ultraModernStyles.spacing.sm,
+    paddingVertical: ultraModernStyles.spacing.md,
+    paddingHorizontal: ultraModernStyles.spacing.lg,
+    borderRadius: ultraModernStyles.radius.md,
+  },
+  methodButtonActive: {
+    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  errorContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: ultraModernStyles.spacing.sm,
+    padding: ultraModernStyles.spacing.md,
+    borderRadius: ultraModernStyles.radius.md,
+    marginBottom: ultraModernStyles.spacing.md,
+  },
+  errorMessages: {
+    flex: 1,
+  },
+  consensusModal: {
+    margin: ultraModernStyles.spacing.lg,
+    padding: ultraModernStyles.spacing.xl,
+    maxHeight: '80%',
+  },
+  consensusHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: ultraModernStyles.spacing.lg,
+  },
+  consensusContent: {
+    maxHeight: 400,
+  },
+  consensusScore: {
+    alignItems: 'center',
+    padding: ultraModernStyles.spacing.lg,
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    borderRadius: ultraModernStyles.radius.lg,
+    marginBottom: ultraModernStyles.spacing.lg,
+  },
+  consensusSection: {
+    marginBottom: ultraModernStyles.spacing.lg,
+  },
+  consensusSectionTitle: {
+    fontWeight: '600',
+    marginBottom: ultraModernStyles.spacing.sm,
+  },
+  consensusItem: {
+    marginLeft: ultraModernStyles.spacing.md,
+    marginBottom: ultraModernStyles.spacing.xs,
+    lineHeight: 20,
+  },
   resultsSection: {
     marginTop: ultraModernStyles.spacing.lg,
   },
