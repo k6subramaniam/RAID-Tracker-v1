@@ -564,6 +564,24 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
   },
+  errorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: ultraModernStyles.spacing.sm,
+    padding: ultraModernStyles.spacing.md,
+    borderRadius: ultraModernStyles.radius.md,
+    marginBottom: ultraModernStyles.spacing.md,
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: ultraModernStyles.spacing.xl,
+  },
 });
 
 export default UltraModernRAIDListScreen;
