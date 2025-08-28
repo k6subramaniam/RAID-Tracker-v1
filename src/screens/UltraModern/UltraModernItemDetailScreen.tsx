@@ -158,14 +158,85 @@ const UltraModernItemDetailScreen: React.FC = () => {
   };
 
   const handleAnalyzeWithAI = async () => {
+    if (!item) return;
+    
     setIsAnalyzing(true);
     try {
       const analysis = await apiService.analyzeItem(item);
-      updateItem(item.id, { ai: analysis });
+      await updateItem(item.id, { ai: analysis });
+      
+      // Reload item to get updated data
+      await loadItemData();
+      
+      Alert.alert('Analysis Complete', 'AI analysis has been updated for this item.');
     } catch (error) {
       console.error('AI analysis failed:', error);
+      Alert.alert('Analysis Failed', 'Unable to analyze item with AI. Please try again.');
     } finally {
       setIsAnalyzing(false);
+    }
+  };
+
+  const handleEditSave = async () => {
+    if (!item) return;
+    
+    // Validate form
+    const validationErrors = validateRAIDItem({
+      type: item.type,
+      title: editForm.title,
+      description: editForm.description,
+      impact: editForm.impact,
+      likelihood: editForm.likelihood,
+      priority: editForm.priority,
+      status: editForm.status,
+      workstream: item.workstream,
+      owner: item.owner,
+      dueDate: editForm.dueDate,
+    });
+
+    if (validationErrors.length > 0) {
+      Alert.alert('Validation Error', formatErrorMessage(validationErrors));
+      return;
+    }
+
+    setIsUpdating(true);
+    try {
+      const updates = {
+        title: editForm.title,
+        description: editForm.description,
+        status: editForm.status,
+        priority: editForm.priority,
+        impact: editForm.impact,
+        likelihood: editForm.likelihood,
+        dueDate: editForm.dueDate || undefined,
+        severityScore: calculateSeverityScore(editForm.impact, editForm.likelihood),
+      };
+
+      await updateItem(item.id, updates);
+      await loadItemData(); // Reload to get updated data
+      setEditModalVisible(false);
+      
+      Alert.alert('Success', 'RAID item has been updated successfully.');
+    } catch (error) {
+      console.error('Update failed:', error);
+      Alert.alert('Update Failed', 'Unable to update item. Please try again.');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!item) return;
+    
+    try {
+      await deleteItem(item.id);
+      setDeleteConfirmVisible(false);
+      navigation.goBack();
+      
+      // Note: Don't show success alert since user is navigating away
+    } catch (error) {
+      console.error('Delete failed:', error);
+      Alert.alert('Delete Failed', 'Unable to delete item. Please try again.');
     }
   };
 
