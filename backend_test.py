@@ -416,19 +416,19 @@ class BackendAPITester:
             self.log_result("Get All RAID Items", False, f"Request error: {str(e)}")
     
     def test_create_raid_item(self):
-        """Test POST /api/raid-items - Create a new RAID item"""
+        """Test POST /api/raid-items - Create a new RAID item with exact data from review request"""
         try:
             # Sample RAID item data as specified in the review request
             sample_raid_data = {
                 "type": "Risk",
-                "title": "Test RAID Item",
-                "description": "This is a test risk item for validation",
+                "title": "Test Database Connection Risk",
+                "description": "There is a risk that the database connection might fail during peak usage times, causing service disruptions.",
                 "status": "Open",
-                "priority": "P2", 
-                "impact": "Medium",
+                "priority": "P1", 
+                "impact": "High",
                 "likelihood": "Medium",
-                "workstream": "ws-1",
-                "owner": "owner-1"
+                "workstream": "backend-development",
+                "owner": "system-admin"
             }
             
             response = self.session.post(
@@ -449,8 +449,8 @@ class BackendAPITester:
                         self.test_raid_item_ids = []
                     self.test_raid_item_ids.append(item_id)
                     
-                    # Verify severity score calculation
-                    expected_severity = 4  # Medium (2) * Medium (2) = 4
+                    # Verify severity score calculation (High=3, Medium=2, so 3*2=6)
+                    expected_severity = 6
                     actual_severity = created_item.get("severityScore")
                     
                     self.log_result(
