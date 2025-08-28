@@ -76,9 +76,14 @@ const UltraModernAIConfigScreen: React.FC = () => {
       setProviders(data.providers || []);
     } catch (error) {
       console.error('Failed to load providers:', error);
+      Alert.alert('Error', 'Failed to load AI providers. Please try again.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const refreshProviders = async () => {
+    await loadProviders();
   };
 
   const validateProvider = async (providerId: string) => {
