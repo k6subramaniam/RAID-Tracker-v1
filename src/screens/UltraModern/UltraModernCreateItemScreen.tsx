@@ -96,6 +96,50 @@ const UltraModernCreateItemScreen: React.FC = () => {
 
   const updateFormData = (updates: Partial<FormData>) => {
     setFormData(prev => ({ ...prev, ...updates }));
+    setHasUnsavedChanges(true);
+    
+    // Clear validation errors for updated fields
+    const updatedFields = Object.keys(updates);
+    setValidationErrors(prev => {
+      const newErrors = { ...prev };
+      updatedFields.forEach(field => {
+        delete newErrors[field];
+      });
+      return newErrors;
+    });
+  };
+
+  const validateCurrentStep = (): boolean => {
+    const errors: Record<string, string> = {};
+    
+    switch (currentStep) {
+      case 0: // Type & Basics
+        if (!formData.type) errors.type = 'Please select a type';
+        if (!formData.title.trim()) errors.title = 'Title is required';
+        else if (formData.title.length < 3) errors.title = 'Title must be at least 3 characters';
+        else if (formData.title.length > 200) errors.title = 'Title must be less than 200 characters';
+        break;
+        
+      case 1: // Details  
+        if (!formData.description.trim()) errors.description = 'Description is required';
+        else if (formData.description.length < 10) errors.description = 'Description must be at least 10 characters';
+        else if (formData.description.length > 2000) errors.description = 'Description must be less than 2000 characters';
+        break;
+        
+      case 2: // Assessment
+        if (!formData.impact) errors.impact = 'Please select an impact level';
+        if (!formData.likelihood) errors.likelihood = 'Please select a likelihood';
+        if (!formData.priority) errors.priority = 'Please select a priority';
+        break;
+        
+      case 3: // Assignment
+        if (!formData.workstream) errors.workstream = 'Please select a workstream';
+        if (!formData.owner) errors.owner = 'Please select an owner';
+        break;
+    }
+    
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const getTypeConfig = (type: ItemType) => {
