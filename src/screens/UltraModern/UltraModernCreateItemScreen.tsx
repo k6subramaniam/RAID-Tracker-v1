@@ -68,6 +68,8 @@ const UltraModernCreateItemScreen: React.FC = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [workstreamModalVisible, setWorkstreamModalVisible] = useState(false);
   const [ownerModalVisible, setOwnerModalVisible] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const steps = [
     { id: 0, title: 'Type & Basics', icon: 'information' },
