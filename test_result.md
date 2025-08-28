@@ -136,6 +136,90 @@ backend:
         agent: "testing"
         comment: "GET /api/health endpoint tested successfully. Returns service status, provider counts, and active provider information. Response includes all expected fields: status, service, providers_count, active_providers."
 
+  - task: "RAID Items - Get All Items"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "GET /api/raid-items endpoint tested successfully. Returns proper JSON structure with 'items' array and 'total' count. Handles empty and populated states correctly."
+
+  - task: "RAID Items - Dashboard Statistics"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "GET /api/raid-items/stats/dashboard endpoint tested successfully. Returns comprehensive statistics including total, by_type, by_status, by_priority, recent_activity, overdue, and active_items. All RAID types (Risk, Issue, Assumption, Dependency) properly tracked."
+
+  - task: "RAID Items - Create Item"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "POST /api/raid-items endpoint tested successfully. Creates RAID items with proper severity score calculation (High=3, Medium=2, so 3*2=6), generates UUIDs, timestamps, and history entries. Tested with exact data from review request."
+
+  - task: "RAID Items - Get Item by ID"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "GET /api/raid-items/{id} endpoint tested successfully. Returns complete item data with all required fields: id, type, title, description, status, priority, impact, likelihood, severityScore, and metadata."
+
+  - task: "RAID Items - Update Item"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "PUT /api/raid-items/{id} endpoint tested successfully. Updates items correctly, recalculates severity scores when impact/likelihood change (High=3, Low=1, so 3*1=3), adds history entries for significant changes, and updates timestamps."
+
+  - task: "RAID Items - Delete Item"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "DELETE /api/raid-items/{id} endpoint tested successfully. Properly deletes items and returns deleted item data. Verified deletion by confirming item is no longer accessible (404 response)."
+
+  - task: "File Upload Functionality"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "POST /api/upload endpoint tested successfully. Handles file uploads with proper metadata storage including id, original_name, filename, size, content_type, and uploaded_at timestamp. Creates uploads directory and generates unique filenames."
+
   - task: "AI Provider Management - List Providers"
     implemented: true
     working: true
