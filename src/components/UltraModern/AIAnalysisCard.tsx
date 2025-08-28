@@ -88,14 +88,77 @@ const AIAnalysisCard: React.FC<AIAnalysisCardProps> = ({
   };
 
   const handleAnalyze = async () => {
+    if (!validateInputs()) {
+      Alert.alert('Validation Error', formatErrorMessage(errors.map(e => ({ field: 'general', message: e }))));
+      return;
+    }
+
     if (onAnalyze && inputText.trim() && selectedProviders.length > 0) {
       try {
+        setErrors([]);
         const result = await apiService.analyzeText(inputText, selectedProviders);
         setAnalysisResults(result.results);
+        setConsensus(result.consensus);
+        
+        // Show consensus modal if we have multiple results
+        if (result.results.length > 1) {
+          setConsensusModalVisible(true);
+        }
+        
         await onAnalyze(inputText, selectedProviders);
       } catch (error) {
         console.error('Analysis failed:', error);
+        setErrors(['Analysis failed. Please try again or check your AI provider configuration.']);
+        Alert.alert('Analysis Error', 'Failed to analyze text. Please try again.');
       }
+    }
+  };
+
+  const handleFileUploaded = (file: any) => {
+    console.log('File uploaded:', file);
+  };
+
+  const handleTextExtracted = (text: string, filename: string) => {
+    setInputText(text);
+    setAnalysisMode('text');
+    Alert.alert(
+      'Text Extracted', 
+      `Text has been extracted from ${filename} and added to the analysis area.`,
+      [{ text: 'OK' }]
+    );
+  };
+
+  const handleClearAll = () => {
+    Alert.alert(
+      'Clear All Content',
+      'This will clear all text and analysis results. Are you sure?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Clear', 
+          style: 'destructive',
+          onPress: () => {
+            setInputText('');
+            setAnalysisResults([]);
+            setConsensus(null);
+            setErrors([]);
+          }
+        }
+      ]
+    );
+  };
+
+  const handleCreateRAIDItems = () => {
+    if (consensus && consensus.risks?.length > 0) {
+      // Navigate to batch create screen with AI suggestions
+      navigation.navigate('BatchCreate', { 
+        aiSuggestions: {
+          risks: consensus.risks,
+          assumptions: consensus.assumptions,
+          issues: consensus.issues,
+          dependencies: consensus.dependencies
+        }
+      });
     }
   };
 
