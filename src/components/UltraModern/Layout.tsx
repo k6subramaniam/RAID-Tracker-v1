@@ -11,6 +11,7 @@ interface LayoutProps {
   subtitle?: string;
   showSidebar?: boolean;
   showBackButton?: boolean;
+  onBackPress?: () => void;
   rightActions?: React.ReactNode;
 }
 
