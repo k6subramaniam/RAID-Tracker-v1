@@ -345,6 +345,7 @@ const AIAnalysisCard: React.FC<AIAnalysisCardProps> = ({
           style={ultraModernStyles.secondaryButton}
           contentStyle={styles.buttonContent}
           icon="broom"
+          onPress={handleClearAll}
         >
           Clear All
         </Button>
@@ -360,6 +361,20 @@ const AIAnalysisCard: React.FC<AIAnalysisCardProps> = ({
           {isAnalyzing ? 'Analyzing...' : 'Analyze with AI'}
         </Button>
       </View>
+
+      {/* Error Messages */}
+      {errors.length > 0 && (
+        <View style={[styles.errorContainer, { backgroundColor: theme.colors.errorContainer }]}>
+          <WebIcon name="alert-circle" size={20} color={theme.colors.error} />
+          <View style={styles.errorMessages}>
+            {errors.map((error, index) => (
+              <Text key={index} variant="bodySmall" style={{ color: theme.colors.error }}>
+                • {error}
+              </Text>
+            ))}
+          </View>
+        </View>
+      )}
 
       {/* Progress Bar */}
       {isAnalyzing && (
