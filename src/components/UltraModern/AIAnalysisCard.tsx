@@ -42,6 +42,11 @@ const AIAnalysisCard: React.FC<AIAnalysisCardProps> = ({
   const [selectedProviders, setSelectedProviders] = useState<string[]>(['openai', 'claude', 'gemini']);
   const [analysisResults, setAnalysisResults] = useState<AIAnalysisResult[]>([]);
   const [availableProviders, setAvailableProviders] = useState<any[]>([]);
+  const [analysisMode, setAnalysisMode] = useState<'text' | 'file'>('text');
+  const [errors, setErrors] = useState<string[]>([]);
+  const [consensusModalVisible, setConsensusModalVisible] = useState(false);
+  const [consensus, setConsensus] = useState<any>(null);
+  const navigation = useNavigation();
   
   // Load available providers on mount
   useEffect(() => {
@@ -51,10 +56,35 @@ const AIAnalysisCard: React.FC<AIAnalysisCardProps> = ({
   const loadProviders = async () => {
     try {
       const data = await apiService.getAIProviders();
-      setAvailableProviders(data.providers || []);
+      setAvailableProviders(data.providers?.filter(p => p.status === 'active') || []);
+      
+      // Update selected providers to only include active ones
+      const activeProviderIds = data.providers?.filter(p => p.status === 'active').map(p => p.id) || [];
+      setSelectedProviders(prev => prev.filter(id => activeProviderIds.includes(id)));
     } catch (error) {
       console.error('Failed to load providers:', error);
+      setErrors(['Failed to load AI providers. Please check your configuration.']);
     }
+  };
+
+  const validateInputs = (): boolean => {
+    const newErrors: string[] = [];
+    
+    if (analysisMode === 'text') {
+      const textValidation = validateRequired(inputText.trim(), 'Analysis text');
+      if (textValidation) {
+        newErrors.push(textValidation.message);
+      } else if (inputText.trim().length < 10) {
+        newErrors.push('Analysis text must be at least 10 characters long');
+      }
+    }
+    
+    if (selectedProviders.length === 0) {
+      newErrors.push('Please select at least one AI provider');
+    }
+    
+    setErrors(newErrors);
+    return newErrors.length === 0;
   };
 
   const handleAnalyze = async () => {
