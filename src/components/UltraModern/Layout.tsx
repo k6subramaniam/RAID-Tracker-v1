@@ -21,6 +21,7 @@ const Layout: React.FC<LayoutProps> = ({
   subtitle,
   showSidebar = true,
   showBackButton = false,
+  onBackPress,
   rightActions,
 }) => {
   const theme = useTheme();
