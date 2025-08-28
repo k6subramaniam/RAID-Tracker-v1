@@ -799,7 +799,75 @@ class BackendAPITester:
         except Exception as e:
             self.log_result("Delete RAID Item", False, f"Request error: {str(e)}")
     
-    def cleanup_test_raid_items(self):
+    def test_create_second_raid_item(self):
+        """Test POST /api/raid-items - Create another RAID item (Issue type) as requested in review"""
+        try:
+            # Sample Issue RAID item data as specified in the review request
+            issue_raid_data = {
+                "type": "Issue",
+                "title": "Test Database Connection Issue",
+                "description": "Database connection is intermittently failing during high load periods, causing service disruptions for users.",
+                "status": "Open",
+                "priority": "P1", 
+                "impact": "High",
+                "likelihood": "Medium",
+                "workstream": "database-operations",
+                "owner": "database-admin"
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/api/raid-items",
+                json=issue_raid_data,
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if "message" in data and "item" in data:
+                    created_item = data["item"]
+                    item_id = created_item.get("id")
+                    
+                    # Store the created item ID for subsequent tests
+                    if not hasattr(self, 'test_raid_item_ids'):
+                        self.test_raid_item_ids = []
+                    self.test_raid_item_ids.append(item_id)
+                    
+                    # Verify severity score calculation (High=3, Medium=2, so 3*2=6)
+                    expected_severity = 6
+                    actual_severity = created_item.get("severityScore")
+                    
+                    self.log_result(
+                        "Create Second RAID Item (Issue)", 
+                        True, 
+                        f"Issue RAID item created successfully with ID: {item_id}", 
+                        {
+                            "item_id": item_id,
+                            "title": created_item.get("title"),
+                            "type": created_item.get("type"),
+                            "severity_score": actual_severity,
+                            "severity_correct": actual_severity == expected_severity,
+                            "has_history": bool(created_item.get("history")),
+                            "created_at": created_item.get("createdAt")
+                        }
+                    )
+                else:
+                    self.log_result(
+                        "Create Second RAID Item (Issue)", 
+                        False, 
+                        "Invalid response format", 
+                        {"response": data}
+                    )
+            else:
+                self.log_result(
+                    "Create Second RAID Item (Issue)", 
+                    False, 
+                    f"HTTP {response.status_code}: {response.text[:100]}"
+                )
+                
+        except Exception as e:
+            self.log_result("Create Second RAID Item (Issue)", False, f"Request error: {str(e)}")
+    
         """Clean up any remaining test RAID items"""
         if hasattr(self, 'test_raid_item_ids'):
             for item_id in self.test_raid_item_ids[:]:
