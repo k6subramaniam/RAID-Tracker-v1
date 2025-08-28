@@ -543,15 +543,26 @@ const UltraModernItemDetailScreen: React.FC = () => {
       subtitle={`${item.type} • ${item.status}`}
       showBackButton
       rightActions={
-        <Button
-          mode="text"
-          onPress={() => {/* Handle delete */}}
-          textColor={theme.colors.error}
-          icon="delete"
-          compact
-        >
-          Delete
-        </Button>
+        <View style={styles.headerActions}>
+          <Button
+            mode="contained-tonal"
+            onPress={() => setEditModalVisible(true)}
+            style={ultraModernStyles.secondaryButton}
+            icon="pencil"
+            compact
+          >
+            Edit
+          </Button>
+          <Button
+            mode="text"
+            onPress={() => setDeleteConfirmVisible(true)}
+            textColor={theme.colors.error}
+            icon="delete"
+            compact
+          >
+            Delete
+          </Button>
+        </View>
       }
     >
       <ScrollView showsVerticalScrollIndicator={false}>
