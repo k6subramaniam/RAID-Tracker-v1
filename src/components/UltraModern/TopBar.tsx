@@ -9,6 +9,7 @@ interface TopBarProps {
   title: string;
   subtitle?: string;
   showBackButton?: boolean;
+  onBackPress?: () => void;
   rightActions?: React.ReactNode;
 }
 
