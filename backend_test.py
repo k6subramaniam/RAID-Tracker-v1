@@ -799,7 +799,18 @@ class BackendAPITester:
         except Exception as e:
             self.log_result("Delete RAID Item", False, f"Request error: {str(e)}")
     
-    def test_create_second_raid_item(self):
+    def cleanup_test_raid_items(self):
+        """Clean up any remaining test RAID items"""
+        if hasattr(self, 'test_raid_item_ids'):
+            for item_id in self.test_raid_item_ids[:]:
+                try:
+                    response = self.session.delete(f"{self.base_url}/api/raid-items/{item_id}", timeout=5)
+                    if response.status_code == 200:
+                        print(f"🧹 Cleaned up test RAID item: {item_id}")
+                        self.test_raid_item_ids.remove(item_id)
+                except:
+                    pass  # Ignore cleanup errors
+    
         """Test POST /api/raid-items - Create another RAID item (Issue type) as requested in review"""
         try:
             # Sample Issue RAID item data as specified in the review request
