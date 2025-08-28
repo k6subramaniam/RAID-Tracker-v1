@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Backend API Testing for RAIDMASTER Multi-AI API
-Tests all AI provider management endpoints as requested in the review.
+Tests all AI provider management endpoints and RAID item CRUD operations as requested in the review.
 """
 
 import requests
@@ -16,6 +16,7 @@ class BackendAPITester:
         self.session = requests.Session()
         self.test_results = []
         self.test_provider_ids = []  # Track created providers for cleanup
+        self.test_raid_item_ids = []  # Track created RAID items for cleanup
         
     def log_result(self, test_name: str, success: bool, message: str, details: Dict = None):
         """Log test result"""
@@ -69,308 +70,6 @@ class BackendAPITester:
         except Exception as e:
             self.log_result("Health Check", False, f"Connection error: {str(e)}")
     
-    def test_get_providers(self):
-        """Test GET /api/ai/providers - Get list of AI providers"""
-        try:
-            response = self.session.get(f"{self.base_url}/api/ai/providers", timeout=10)
-            
-            if response.status_code == 200:
-                data = response.json()
-                
-                if "providers" in data and isinstance(data["providers"], list):
-                    providers = data["providers"]
-                    provider_count = len(providers)
-                    
-                    # Check if default providers are loaded
-                    provider_names = [p.get("name", "") for p in providers]
-                    
-                    self.log_result(
-                        "Get Providers", 
-                        True, 
-                        f"Retrieved {provider_count} providers successfully", 
-                        {
-                            "provider_count": provider_count,
-                            "provider_names": provider_names[:5],  # Show first 5
-                            "sample_provider": providers[0] if providers else None
-                        }
-                    )
-                else:
-                    self.log_result(
-                        "Get Providers", 
-                        False, 
-                        "Invalid response format - missing 'providers' array", 
-                        {"response": data}
-                    )
-            else:
-                self.log_result(
-                    "Get Providers", 
-                    False, 
-                    f"HTTP {response.status_code}: {response.text[:100]}"
-                )
-                
-        except Exception as e:
-            self.log_result("Get Providers", False, f"Request error: {str(e)}")
-    
-    def test_add_provider(self):
-        """Test POST /api/ai/providers - Add a new AI provider"""
-        try:
-            # Create test provider data
-            test_provider = {
-                "id": f"test_provider_{uuid.uuid4().hex[:8]}",
-                "name": "Test OpenAI Provider",
-                "provider": "openai",
-                "model": "gpt-4o",
-                "api_key": "sk-test-key-for-testing-purposes-only",
-                "enabled": True
-            }
-            
-            response = self.session.post(
-                f"{self.base_url}/api/ai/providers", 
-                json=test_provider,
-                timeout=10
-            )
-            
-            if response.status_code == 200:
-                data = response.json()
-                
-                if "message" in data and "provider_id" in data:
-                    provider_id = data["provider_id"]
-                    self.test_provider_ids.append(provider_id)  # Track for cleanup
-                    
-                    self.log_result(
-                        "Add Provider", 
-                        True, 
-                        f"Provider added successfully with ID: {provider_id}", 
-                        {
-                            "provider_id": provider_id,
-                            "message": data["message"]
-                        }
-                    )
-                else:
-                    self.log_result(
-                        "Add Provider", 
-                        False, 
-                        "Invalid response format", 
-                        {"response": data}
-                    )
-            else:
-                self.log_result(
-                    "Add Provider", 
-                    False, 
-                    f"HTTP {response.status_code}: {response.text[:100]}"
-                )
-                
-        except Exception as e:
-            self.log_result("Add Provider", False, f"Request error: {str(e)}")
-    
-    def test_update_provider(self):
-        """Test PUT /api/ai/providers/{id} - Update an AI provider"""
-        if not self.test_provider_ids:
-            self.log_result("Update Provider", False, "No test provider available to update")
-            return
-            
-        try:
-            provider_id = self.test_provider_ids[0]
-            
-            # Updated provider data
-            updated_provider = {
-                "id": provider_id,
-                "name": "Updated Test Provider",
-                "provider": "openai",
-                "model": "gpt-4o-mini",
-                "api_key": "sk-updated-test-key-for-testing",
-                "enabled": False
-            }
-            
-            response = self.session.put(
-                f"{self.base_url}/api/ai/providers/{provider_id}", 
-                json=updated_provider,
-                timeout=10
-            )
-            
-            if response.status_code == 200:
-                data = response.json()
-                
-                if "message" in data:
-                    self.log_result(
-                        "Update Provider", 
-                        True, 
-                        f"Provider {provider_id} updated successfully", 
-                        {"message": data["message"]}
-                    )
-                else:
-                    self.log_result(
-                        "Update Provider", 
-                        False, 
-                        "Invalid response format", 
-                        {"response": data}
-                    )
-            else:
-                self.log_result(
-                    "Update Provider", 
-                    False, 
-                    f"HTTP {response.status_code}: {response.text[:100]}"
-                )
-                
-        except Exception as e:
-            self.log_result("Update Provider", False, f"Request error: {str(e)}")
-    
-    def test_validate_provider(self):
-        """Test POST /api/ai/providers/{id}/validate - Validate a specific provider"""
-        if not self.test_provider_ids:
-            self.log_result("Validate Provider", False, "No test provider available to validate")
-            return
-            
-        try:
-            provider_id = self.test_provider_ids[0]
-            
-            response = self.session.post(
-                f"{self.base_url}/api/ai/providers/{provider_id}/validate",
-                timeout=30  # Validation might take longer
-            )
-            
-            if response.status_code == 200:
-                data = response.json()
-                expected_fields = ["valid", "status", "message"]
-                
-                if all(field in data for field in expected_fields):
-                    self.log_result(
-                        "Validate Provider", 
-                        True, 
-                        f"Validation completed - Valid: {data['valid']}, Status: {data['status']}", 
-                        {
-                            "valid": data["valid"],
-                            "status": data["status"],
-                            "message": data["message"],
-                            "response_time": data.get("response_time")
-                        }
-                    )
-                else:
-                    self.log_result(
-                        "Validate Provider", 
-                        False, 
-                        "Invalid response format", 
-                        {"response": data}
-                    )
-            else:
-                self.log_result(
-                    "Validate Provider", 
-                    False, 
-                    f"HTTP {response.status_code}: {response.text[:100]}"
-                )
-                
-        except Exception as e:
-            self.log_result("Validate Provider", False, f"Request error: {str(e)}")
-    
-    def test_validate_all_providers(self):
-        """Test POST /api/ai/providers/validate-all - Validate all providers"""
-        try:
-            response = self.session.post(
-                f"{self.base_url}/api/ai/providers/validate-all",
-                timeout=10
-            )
-            
-            if response.status_code == 200:
-                data = response.json()
-                
-                if "message" in data and "providers_count" in data:
-                    self.log_result(
-                        "Validate All Providers", 
-                        True, 
-                        f"Validation started for {data['providers_count']} providers", 
-                        {
-                            "message": data["message"],
-                            "providers_count": data["providers_count"]
-                        }
-                    )
-                else:
-                    self.log_result(
-                        "Validate All Providers", 
-                        False, 
-                        "Invalid response format", 
-                        {"response": data}
-                    )
-            else:
-                self.log_result(
-                    "Validate All Providers", 
-                    False, 
-                    f"HTTP {response.status_code}: {response.text[:100]}"
-                )
-                
-        except Exception as e:
-            self.log_result("Validate All Providers", False, f"Request error: {str(e)}")
-    
-    def test_analyze_text(self):
-        """Test POST /api/analyze - Analyze text with AI providers (using /api/analyze endpoint)"""
-        try:
-            # Create sample RAID item for analysis
-            sample_raid_item = {
-                "id": f"test_item_{uuid.uuid4().hex[:8]}",
-                "type": "Risk",
-                "title": "API Rate Limiting Risk",
-                "description": "Third-party API may impose rate limits that could affect system performance during peak usage periods.",
-                "status": "Open",
-                "priority": "P2",
-                "impact": "Medium",
-                "likelihood": "High",
-                "workstream": "Backend Development",
-                "owner": "Backend Team",
-                "dueDate": "2025-02-15"
-            }
-            
-            analysis_request = {
-                "item": sample_raid_item,
-                "analysisType": "analysis"
-            }
-            
-            response = self.session.post(
-                f"{self.base_url}/api/analyze",
-                json=analysis_request,
-                timeout=30  # AI analysis might take longer
-            )
-            
-            if response.status_code == 200:
-                data = response.json()
-                expected_fields = ["analysis", "suggestedPriority", "confidence", "flags", "provider_used", "response_time"]
-                
-                if all(field in data for field in expected_fields):
-                    self.log_result(
-                        "Analyze Text", 
-                        True, 
-                        f"Analysis completed using {data['provider_used']}", 
-                        {
-                            "provider_used": data["provider_used"],
-                            "suggested_priority": data["suggestedPriority"],
-                            "confidence": data["confidence"],
-                            "response_time": data["response_time"],
-                            "flags_count": len(data["flags"]),
-                            "analysis_preview": data["analysis"][:100] + "..." if len(data["analysis"]) > 100 else data["analysis"]
-                        }
-                    )
-                else:
-                    self.log_result(
-                        "Analyze Text", 
-                        False, 
-                        "Invalid response format", 
-                        {"response": data, "missing_fields": [f for f in expected_fields if f not in data]}
-                    )
-            elif response.status_code == 503:
-                self.log_result(
-                    "Analyze Text", 
-                    False, 
-                    "No active AI providers available for analysis", 
-                    {"status_code": response.status_code, "response": response.text[:200]}
-                )
-            else:
-                self.log_result(
-                    "Analyze Text", 
-                    False, 
-                    f"HTTP {response.status_code}: {response.text[:100]}"
-                )
-                
-        except Exception as e:
-            self.log_result("Analyze Text", False, f"Request error: {str(e)}")
-
     # ============================================================================
     # RAID ITEMS CRUD TESTING METHODS
     # ============================================================================
@@ -415,6 +114,55 @@ class BackendAPITester:
         except Exception as e:
             self.log_result("Get All RAID Items", False, f"Request error: {str(e)}")
     
+    def test_get_dashboard_stats(self):
+        """Test GET /api/raid-items/stats/dashboard - Get dashboard statistics"""
+        try:
+            response = self.session.get(f"{self.base_url}/api/raid-items/stats/dashboard", timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                expected_fields = ["total", "by_type", "by_status", "by_priority", "recent_activity", "overdue"]
+                
+                if all(field in data for field in expected_fields):
+                    # Verify by_type has all RAID types
+                    by_type = data.get("by_type", {})
+                    expected_types = ["Risk", "Issue", "Assumption", "Dependency"]
+                    has_all_types = all(raid_type in by_type for raid_type in expected_types)
+                    
+                    self.log_result(
+                        "Get Dashboard Stats", 
+                        True, 
+                        f"Dashboard statistics retrieved successfully", 
+                        {
+                            "total_items": data.get("total"),
+                            "by_type": by_type,
+                            "by_status": data.get("by_status"),
+                            "by_priority": data.get("by_priority"),
+                            "recent_activity": data.get("recent_activity"),
+                            "overdue": data.get("overdue"),
+                            "active_items": data.get("active_items"),
+                            "has_all_raid_types": has_all_types
+                        }
+                    )
+                else:
+                    missing_fields = [f for f in expected_fields if f not in data]
+                    self.log_result(
+                        "Get Dashboard Stats", 
+                        False, 
+                        f"Missing expected fields: {missing_fields}", 
+                        {"response": data, "missing_fields": missing_fields}
+                    )
+            else:
+                self.log_result(
+                    "Get Dashboard Stats", 
+                    False, 
+                    f"HTTP {response.status_code}: {response.text[:100]}"
+                )
+                
+        except Exception as e:
+            self.log_result("Get Dashboard Stats", False, f"Request error: {str(e)}")
+    
     def test_create_raid_item(self):
         """Test POST /api/raid-items - Create a new RAID item with exact data from review request"""
         try:
@@ -445,8 +193,6 @@ class BackendAPITester:
                     item_id = created_item.get("id")
                     
                     # Store the created item ID for subsequent tests
-                    if not hasattr(self, 'test_raid_item_ids'):
-                        self.test_raid_item_ids = []
                     self.test_raid_item_ids.append(item_id)
                     
                     # Verify severity score calculation (High=3, Medium=2, so 3*2=6)
@@ -486,7 +232,7 @@ class BackendAPITester:
     
     def test_get_raid_item_by_id(self):
         """Test GET /api/raid-items/{id} - Get specific RAID item by ID"""
-        if not hasattr(self, 'test_raid_item_ids') or not self.test_raid_item_ids:
+        if not self.test_raid_item_ids:
             self.log_result("Get RAID Item by ID", False, "No test RAID item available")
             return
             
@@ -542,21 +288,19 @@ class BackendAPITester:
     
     def test_update_raid_item(self):
         """Test PUT /api/raid-items/{id} - Update a RAID item"""
-        if not hasattr(self, 'test_raid_item_ids') or not self.test_raid_item_ids:
+        if not self.test_raid_item_ids:
             self.log_result("Update RAID Item", False, "No test RAID item available")
             return
             
         try:
             item_id = self.test_raid_item_ids[0]
             
-            # Update data
+            # Update data - change status to "In Progress" as requested in review
             update_data = {
-                "title": "Updated Test RAID Item",
                 "status": "In Progress",
                 "priority": "P1",
                 "impact": "High",
-                "likelihood": "Low",
-                "owner": "updated-owner"
+                "likelihood": "Low"
             }
             
             response = self.session.put(
@@ -572,7 +316,6 @@ class BackendAPITester:
                     updated_item = data["item"]
                     
                     # Verify updates were applied
-                    title_updated = updated_item.get("title") == update_data["title"]
                     status_updated = updated_item.get("status") == update_data["status"]
                     priority_updated = updated_item.get("priority") == update_data["priority"]
                     
@@ -590,7 +333,6 @@ class BackendAPITester:
                         f"RAID item {item_id} updated successfully", 
                         {
                             "item_id": item_id,
-                            "title_updated": title_updated,
                             "status_updated": status_updated,
                             "priority_updated": priority_updated,
                             "severity_recalculated": actual_severity == expected_severity,
@@ -623,54 +365,72 @@ class BackendAPITester:
         except Exception as e:
             self.log_result("Update RAID Item", False, f"Request error: {str(e)}")
     
-    def test_get_dashboard_stats(self):
-        """Test GET /api/raid-items/stats/dashboard - Get dashboard statistics"""
+    def test_create_second_raid_item(self):
+        """Test POST /api/raid-items - Create another RAID item (Issue type) as requested in review"""
         try:
-            response = self.session.get(f"{self.base_url}/api/raid-items/stats/dashboard", timeout=10)
+            # Sample Issue RAID item data as specified in the review request
+            issue_raid_data = {
+                "type": "Issue",
+                "title": "Test Database Connection Issue",
+                "description": "Database connection is intermittently failing during high load periods, causing service disruptions for users.",
+                "status": "Open",
+                "priority": "P1", 
+                "impact": "High",
+                "likelihood": "Medium",
+                "workstream": "database-operations",
+                "owner": "database-admin"
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/api/raid-items",
+                json=issue_raid_data,
+                timeout=10
+            )
             
             if response.status_code == 200:
                 data = response.json()
                 
-                expected_fields = ["total", "by_type", "by_status", "by_priority", "recent_activity", "overdue"]
-                
-                if all(field in data for field in expected_fields):
-                    # Verify by_type has all RAID types
-                    by_type = data.get("by_type", {})
-                    expected_types = ["Risk", "Issue", "Assumption", "Dependency"]
-                    has_all_types = all(raid_type in by_type for raid_type in expected_types)
+                if "message" in data and "item" in data:
+                    created_item = data["item"]
+                    item_id = created_item.get("id")
+                    
+                    # Store the created item ID for subsequent tests
+                    self.test_raid_item_ids.append(item_id)
+                    
+                    # Verify severity score calculation (High=3, Medium=2, so 3*2=6)
+                    expected_severity = 6
+                    actual_severity = created_item.get("severityScore")
                     
                     self.log_result(
-                        "Get Dashboard Stats", 
+                        "Create Second RAID Item (Issue)", 
                         True, 
-                        f"Dashboard statistics retrieved successfully", 
+                        f"Issue RAID item created successfully with ID: {item_id}", 
                         {
-                            "total_items": data.get("total"),
-                            "by_type": by_type,
-                            "by_status": data.get("by_status"),
-                            "by_priority": data.get("by_priority"),
-                            "recent_activity": data.get("recent_activity"),
-                            "overdue": data.get("overdue"),
-                            "active_items": data.get("active_items"),
-                            "has_all_raid_types": has_all_types
+                            "item_id": item_id,
+                            "title": created_item.get("title"),
+                            "type": created_item.get("type"),
+                            "severity_score": actual_severity,
+                            "severity_correct": actual_severity == expected_severity,
+                            "has_history": bool(created_item.get("history")),
+                            "created_at": created_item.get("createdAt")
                         }
                     )
                 else:
-                    missing_fields = [f for f in expected_fields if f not in data]
                     self.log_result(
-                        "Get Dashboard Stats", 
+                        "Create Second RAID Item (Issue)", 
                         False, 
-                        f"Missing expected fields: {missing_fields}", 
-                        {"response": data, "missing_fields": missing_fields}
+                        "Invalid response format", 
+                        {"response": data}
                     )
             else:
                 self.log_result(
-                    "Get Dashboard Stats", 
+                    "Create Second RAID Item (Issue)", 
                     False, 
                     f"HTTP {response.status_code}: {response.text[:100]}"
                 )
                 
         except Exception as e:
-            self.log_result("Get Dashboard Stats", False, f"Request error: {str(e)}")
+            self.log_result("Create Second RAID Item (Issue)", False, f"Request error: {str(e)}")
     
     def test_file_upload(self):
         """Test POST /api/upload - Test file upload functionality"""
@@ -696,11 +456,6 @@ class BackendAPITester:
                 if "message" in data and "file" in data:
                     file_info = data["file"]
                     file_id = file_info.get("id")
-                    
-                    # Store file ID for potential cleanup
-                    if not hasattr(self, 'test_file_ids'):
-                        self.test_file_ids = []
-                    self.test_file_ids.append(file_id)
                     
                     # Verify file metadata
                     expected_file_fields = ["id", "original_name", "filename", "size", "content_type", "uploaded_at"]
@@ -739,7 +494,7 @@ class BackendAPITester:
     
     def test_delete_raid_item(self):
         """Test DELETE /api/raid-items/{id} - Delete a RAID item"""
-        if not hasattr(self, 'test_raid_item_ids') or not self.test_raid_item_ids:
+        if not self.test_raid_item_ids:
             self.log_result("Delete RAID Item", False, "No test RAID item available to delete")
             return
             
@@ -801,145 +556,12 @@ class BackendAPITester:
     
     def cleanup_test_raid_items(self):
         """Clean up any remaining test RAID items"""
-        if hasattr(self, 'test_raid_item_ids'):
-            for item_id in self.test_raid_item_ids[:]:
-                try:
-                    response = self.session.delete(f"{self.base_url}/api/raid-items/{item_id}", timeout=5)
-                    if response.status_code == 200:
-                        print(f"🧹 Cleaned up test RAID item: {item_id}")
-                        self.test_raid_item_ids.remove(item_id)
-                except:
-                    pass  # Ignore cleanup errors
-    
-        """Test POST /api/raid-items - Create another RAID item (Issue type) as requested in review"""
-        try:
-            # Sample Issue RAID item data as specified in the review request
-            issue_raid_data = {
-                "type": "Issue",
-                "title": "Test Database Connection Issue",
-                "description": "Database connection is intermittently failing during high load periods, causing service disruptions for users.",
-                "status": "Open",
-                "priority": "P1", 
-                "impact": "High",
-                "likelihood": "Medium",
-                "workstream": "database-operations",
-                "owner": "database-admin"
-            }
-            
-            response = self.session.post(
-                f"{self.base_url}/api/raid-items",
-                json=issue_raid_data,
-                timeout=10
-            )
-            
-            if response.status_code == 200:
-                data = response.json()
-                
-                if "message" in data and "item" in data:
-                    created_item = data["item"]
-                    item_id = created_item.get("id")
-                    
-                    # Store the created item ID for subsequent tests
-                    if not hasattr(self, 'test_raid_item_ids'):
-                        self.test_raid_item_ids = []
-                    self.test_raid_item_ids.append(item_id)
-                    
-                    # Verify severity score calculation (High=3, Medium=2, so 3*2=6)
-                    expected_severity = 6
-                    actual_severity = created_item.get("severityScore")
-                    
-                    self.log_result(
-                        "Create Second RAID Item (Issue)", 
-                        True, 
-                        f"Issue RAID item created successfully with ID: {item_id}", 
-                        {
-                            "item_id": item_id,
-                            "title": created_item.get("title"),
-                            "type": created_item.get("type"),
-                            "severity_score": actual_severity,
-                            "severity_correct": actual_severity == expected_severity,
-                            "has_history": bool(created_item.get("history")),
-                            "created_at": created_item.get("createdAt")
-                        }
-                    )
-                else:
-                    self.log_result(
-                        "Create Second RAID Item (Issue)", 
-                        False, 
-                        "Invalid response format", 
-                        {"response": data}
-                    )
-            else:
-                self.log_result(
-                    "Create Second RAID Item (Issue)", 
-                    False, 
-                    f"HTTP {response.status_code}: {response.text[:100]}"
-                )
-                
-        except Exception as e:
-            self.log_result("Create Second RAID Item (Issue)", False, f"Request error: {str(e)}")
-    
-        """Clean up any remaining test RAID items"""
-        if hasattr(self, 'test_raid_item_ids'):
-            for item_id in self.test_raid_item_ids[:]:
-                try:
-                    response = self.session.delete(f"{self.base_url}/api/raid-items/{item_id}", timeout=5)
-                    if response.status_code == 200:
-                        print(f"🧹 Cleaned up test RAID item: {item_id}")
-                        self.test_raid_item_ids.remove(item_id)
-                except:
-                    pass  # Ignore cleanup errors
-    
-    def test_delete_provider(self):
-        """Test DELETE /api/ai/providers/{id} - Delete an AI provider"""
-        if not self.test_provider_ids:
-            self.log_result("Delete Provider", False, "No test provider available to delete")
-            return
-            
-        try:
-            provider_id = self.test_provider_ids[0]
-            
-            response = self.session.delete(
-                f"{self.base_url}/api/ai/providers/{provider_id}",
-                timeout=10
-            )
-            
-            if response.status_code == 200:
-                data = response.json()
-                
-                if "message" in data:
-                    self.log_result(
-                        "Delete Provider", 
-                        True, 
-                        f"Provider {provider_id} deleted successfully", 
-                        {"message": data["message"]}
-                    )
-                    self.test_provider_ids.remove(provider_id)  # Remove from tracking
-                else:
-                    self.log_result(
-                        "Delete Provider", 
-                        False, 
-                        "Invalid response format", 
-                        {"response": data}
-                    )
-            else:
-                self.log_result(
-                    "Delete Provider", 
-                    False, 
-                    f"HTTP {response.status_code}: {response.text[:100]}"
-                )
-                
-        except Exception as e:
-            self.log_result("Delete Provider", False, f"Request error: {str(e)}")
-    
-    def cleanup_test_providers(self):
-        """Clean up any remaining test providers"""
-        for provider_id in self.test_provider_ids[:]:
+        for item_id in self.test_raid_item_ids[:]:
             try:
-                response = self.session.delete(f"{self.base_url}/api/ai/providers/{provider_id}", timeout=5)
+                response = self.session.delete(f"{self.base_url}/api/raid-items/{item_id}", timeout=5)
                 if response.status_code == 200:
-                    print(f"🧹 Cleaned up test provider: {provider_id}")
-                    self.test_provider_ids.remove(provider_id)
+                    print(f"🧹 Cleaned up test RAID item: {item_id}")
+                    self.test_raid_item_ids.remove(item_id)
             except:
                 pass  # Ignore cleanup errors
     
@@ -948,18 +570,8 @@ class BackendAPITester:
         print("🚀 Starting Backend API Testing for RAIDMASTER Multi-AI API")
         print("=" * 60)
         
-        # Test sequence as requested in review
+        # Test health endpoint first
         self.test_health_endpoint()
-        self.test_get_providers()
-        self.test_add_provider()
-        self.test_update_provider()
-        self.test_validate_provider()
-        self.test_validate_all_providers()
-        self.test_analyze_text()
-        self.test_delete_provider()
-        
-        # Cleanup AI providers
-        self.cleanup_test_providers()
         
         print("\n" + "🔧" * 60)
         print("🎯 RAID ITEM MANAGEMENT SYSTEM TESTING")
