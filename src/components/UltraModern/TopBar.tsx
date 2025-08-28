@@ -17,13 +17,18 @@ const TopBar: React.FC<TopBarProps> = ({
   title, 
   subtitle, 
   showBackButton = false,
+  onBackPress,
   rightActions 
 }) => {
   const theme = useTheme();
   const navigation = useNavigation();
 
   const handleBackPress = () => {
-    navigation.goBack();
+    if (onBackPress) {
+      onBackPress();
+    } else {
+      navigation.goBack();
+    }
   };
 
   return (
