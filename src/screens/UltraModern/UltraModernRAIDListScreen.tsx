@@ -158,6 +158,24 @@ const UltraModernRAIDListScreen: React.FC = () => {
         isAnalyzing={isAnalyzing}
       />
 
+      {/* Error Message */}
+      {error && (
+        <View style={[styles.errorContainer, { backgroundColor: theme.colors.errorContainer }]}>
+          <WebIcon name="alert-circle" size={20} color={theme.colors.error} />
+          <Text variant="bodyMedium" style={{ color: theme.colors.error, flex: 1 }}>
+            {error}
+          </Text>
+          <Button
+            mode="text"
+            onPress={() => handleRefresh()}
+            textColor={theme.colors.error}
+            compact
+          >
+            Retry
+          </Button>
+        </View>
+      )}
+
       {/* Search and Filters */}
       <View style={[styles.searchSection, ultraModernStyles.ultraCard, { backgroundColor: theme.colors.surface }]}>
         <View style={styles.searchHeader}>
