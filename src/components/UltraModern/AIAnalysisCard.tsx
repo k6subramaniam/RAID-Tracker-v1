@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Pressable, ScrollView } from 'react-native';
+import { View, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
 import { 
   Text, 
   useTheme, 
@@ -7,11 +7,16 @@ import {
   TextInput, 
   ProgressBar,
   Chip,
-  Divider 
+  Divider,
+  Portal,
+  Modal,
 } from 'react-native-paper';
+import { useNavigation } from '@react-navigation/native';
 import WebIcon from '../WebIcon';
+import FileUpload from './FileUpload';
 import { ultraModernStyles } from '../../theme/ultraModern';
 import { apiService } from '../../services/api';
+import { validateRequired, formatErrorMessage } from '../../utils/validation';
 
 interface AIAnalysisCardProps {
   onAnalyze?: (text: string, providers: string[]) => Promise<void>;
