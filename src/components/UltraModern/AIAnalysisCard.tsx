@@ -200,53 +200,95 @@ const AIAnalysisCard: React.FC<AIAnalysisCardProps> = ({
       </View>
 
       {/* Upload Area */}
-      <Pressable 
-        style={[
-          styles.uploadArea, 
-          { 
-            backgroundColor: theme.colors.surfaceVariant,
-            borderColor: theme.colors.outline,
-          }
-        ]}
-      >
-        <View style={[styles.uploadIcon, { backgroundColor: theme.colors.surfaceContainer }]}>
-          <WebIcon name="cloud-upload" size={20} color={theme.colors.primary} />
-        </View>
-        <Text variant="titleMedium" style={{ color: theme.colors.onSurface }}>
-          Drop files here or click to browse
+      <View style={styles.analysisMethodSelector}>
+        <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onSurface }]}>
+          📄 Choose Analysis Method
         </Text>
-        <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-          Support for PDF, DOC, TXT and other document formats
-        </Text>
-      </Pressable>
-
-      {/* Text Analysis Area */}
-      <View style={[styles.textArea, { backgroundColor: theme.colors.surfaceContainer }]}>
-        <View style={styles.textHeader}>
-          <Text variant="titleMedium" style={{ color: theme.colors.onSurface }}>
-            Or paste your text for analysis
-          </Text>
-          <Text variant="bodySmall" style={{ color: theme.colors.tertiary }}>
-            {inputText.length} / 10,000 characters
-          </Text>
-        </View>
         
-        <TextInput
-          mode="flat"
-          multiline
-          numberOfLines={8}
-          value={inputText}
-          onChangeText={setInputText}
-          placeholder="Enter your project documentation, meeting notes, or any text that might contain risks, assumptions, issues, or dependencies..."
-          placeholderTextColor={theme.colors.tertiary}
-          style={[
-            styles.textInput,
-            ultraModernStyles.ultraInput,
-            { backgroundColor: theme.colors.surfaceVariant }
-          ]}
-          contentStyle={{ color: theme.colors.onSurface }}
-        />
+        <View style={styles.methodButtons}>
+          <Pressable
+            style={[
+              styles.methodButton,
+              analysisMode === 'text' && [styles.methodButtonActive, { backgroundColor: theme.colors.primary }],
+              { backgroundColor: analysisMode === 'text' ? theme.colors.primary : theme.colors.surfaceVariant }
+            ]}
+            onPress={() => setAnalysisMode('text')}
+          >
+            <WebIcon 
+              name="text-box" 
+              size={20} 
+              color={analysisMode === 'text' ? theme.colors.onPrimary : theme.colors.onSurfaceVariant} 
+            />
+            <Text 
+              style={{ 
+                color: analysisMode === 'text' ? theme.colors.onPrimary : theme.colors.onSurfaceVariant,
+                fontWeight: '600'
+              }}
+            >
+              Text Input
+            </Text>
+          </Pressable>
+          
+          <Pressable
+            style={[
+              styles.methodButton,
+              analysisMode === 'file' && [styles.methodButtonActive, { backgroundColor: theme.colors.primary }],
+              { backgroundColor: analysisMode === 'file' ? theme.colors.primary : theme.colors.surfaceVariant }
+            ]}
+            onPress={() => setAnalysisMode('file')}
+          >
+            <WebIcon 
+              name="file-upload" 
+              size={20} 
+              color={analysisMode === 'file' ? theme.colors.onPrimary : theme.colors.onSurfaceVariant} 
+            />
+            <Text 
+              style={{ 
+                color: analysisMode === 'file' ? theme.colors.onPrimary : theme.colors.onSurfaceVariant,
+                fontWeight: '600'
+              }}
+            >
+              File Upload
+            </Text>
+          </Pressable>
+        </View>
       </View>
+
+      {analysisMode === 'file' ? (
+        <FileUpload
+          onFileUploaded={handleFileUploaded}
+          onTextExtracted={handleTextExtracted}
+        />
+      ) : (
+        <View style={[styles.textArea, { backgroundColor: theme.colors.surfaceContainer }]}>
+          <View style={styles.textHeader}>
+            <Text variant="titleMedium" style={{ color: theme.colors.onSurface }}>
+              Enter your text for analysis
+            </Text>
+            <Text variant="bodySmall" style={{ color: theme.colors.tertiary }}>
+              {inputText.length} / 10,000 characters
+            </Text>
+          </View>
+          
+          <TextInput
+            mode="flat"
+            multiline
+            numberOfLines={8}
+            value={inputText}
+            onChangeText={setInputText}
+            placeholder="Enter your project documentation, meeting notes, or any text that might contain risks, assumptions, issues, or dependencies..."
+            placeholderTextColor={theme.colors.tertiary}
+            style={[
+              styles.textInput,
+              ultraModernStyles.ultraInput,
+              { backgroundColor: theme.colors.surfaceVariant }
+            ]}
+            contentStyle={{ color: theme.colors.onSurface }}
+            maxLength={10000}
+            error={errors.some(e => e.includes('text'))}
+          />
+        </View>
+      )}
 
       {/* Provider Selection */}
       <View style={styles.providerSection}>
