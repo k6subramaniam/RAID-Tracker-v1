@@ -690,6 +690,7 @@ const UltraModernCreateItemScreen: React.FC = () => {
       title="Create New Item"
       subtitle={`Step ${currentStep + 1} of ${steps.length}`}
       showBackButton
+      onBackPress={handleBackNavigation}
     >
       <ScrollView showsVerticalScrollIndicator={false}>
         {renderProgressIndicator()}
