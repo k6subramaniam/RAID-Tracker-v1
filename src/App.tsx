@@ -4,6 +4,7 @@ import { PaperProvider } from 'react-native-paper';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import ErrorBoundary from './components/ErrorBoundary';
 import UltraModernNavigator from './navigation/UltraModernNavigator';
 import { useStore } from './store';
 import { ultraModernTheme } from './theme/ultraModern';
@@ -17,13 +18,15 @@ export default function App() {
   }, [initializeSampleData]);
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
-        <PaperProvider theme={ultraModernTheme}>
-          <StatusBar style="light" backgroundColor={ultraModernTheme.colors.background} />
-          <UltraModernNavigator />
-        </PaperProvider>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
+    <ErrorBoundary>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <SafeAreaProvider>
+          <PaperProvider theme={ultraModernTheme}>
+            <StatusBar style="light" backgroundColor={ultraModernTheme.colors.background} />
+            <UltraModernNavigator />
+          </PaperProvider>
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+    </ErrorBoundary>
   );
 }
