@@ -379,11 +379,20 @@ const UltraModernCreateItemScreen: React.FC = () => {
         multiline
         numberOfLines={8}
         style={[ultraModernStyles.ultraInput, styles.descriptionInput]}
+        error={!!validationErrors.description}
+        maxLength={2000}
       />
       
-      <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
-        {formData.description.length} / 1000 characters
-      </Text>
+      <View style={styles.characterCount}>
+        <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
+          {formData.description.length} / 2000 characters
+        </Text>
+        {validationErrors.description && (
+          <Text variant="bodySmall" style={{ color: theme.colors.error }}>
+            {validationErrors.description}
+          </Text>
+        )}
+      </View>
       
       <Divider style={styles.divider} />
       
