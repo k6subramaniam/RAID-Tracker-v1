@@ -1,7 +1,14 @@
 {
+<<<<<<< HEAD
   "name": "RAIDMASTER",
   "short_name": "RAIDMASTER",
   "start_url": "/",
+=======
+  "name": "RAIDMASTER - Professional RAID Management System",
+  "short_name": "RAIDMASTER",
+  "description": "Professional RAID (Risks, Assumptions, Issues, Dependencies) Management System",
+  "start_url": "/index.html",
+>>>>>>> b97c122 (feat: Convert HTML app to PWA and prepare for Android APK generation)
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#5D5CDE",
@@ -10,12 +17,46 @@
     {
       "src": "icon-192.png",
       "sizes": "192x192",
+<<<<<<< HEAD
       "type": "image/png"
+=======
+      "type": "image/png",
+      "purpose": "any maskable"
+>>>>>>> b97c122 (feat: Convert HTML app to PWA and prepare for Android APK generation)
     },
     {
       "src": "icon-512.png",
       "sizes": "512x512",
+<<<<<<< HEAD
       "type": "image/png"
     }
   ]
 }
+=======
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "lang": "en-US",
+  "dir": "ltr",
+  "scope": "/",
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Add Risk",
+      "short_name": "Risk",
+      "description": "Add a new risk item",
+      "url": "/index.html?action=add-risk",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "View Matrix",
+      "short_name": "Matrix",
+      "description": "View risk matrix",
+      "url": "/index.html?tab=matrix",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
+>>>>>>> b97c122 (feat: Convert HTML app to PWA and prepare for Android APK generation)
