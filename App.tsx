@@ -1,2 +1,7 @@
-// Production-ready RAIDMASTER App
-export { default } from './ProductionApp';
+// RAIDMASTER WebView App - HTML to APK wrapper
+import React from 'react';
+import WebViewAppEmbedded from './WebViewAppEmbedded';
+
+export default function App() {
+  return <WebViewAppEmbedded />;
+}
