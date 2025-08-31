@@ -2,44 +2,112 @@
   "name": "RAIDMASTER - Professional RAID Management System",
   "short_name": "RAIDMASTER",
   "description": "Professional RAID (Risks, Assumptions, Issues, Dependencies) Management System",
-  "start_url": "/index.html",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "fullscreen", "minimal-ui", "browser"],
   "background_color": "#ffffff",
   "theme_color": "#5D5CDE",
-  "orientation": "portrait",
+  "orientation": "any",
+  "id": "com.raidmaster.app",
   "icons": [
     {
-      "src": "icon-192.png",
-      "sizes": "192x192",
+      "src": "/icon-48.png",
+      "sizes": "48x48",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "icon-512.png",
+      "src": "/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-168.png",
+      "sizes": "168x168",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "categories": ["business", "productivity"],
   "lang": "en-US",
   "dir": "ltr",
-  "scope": "/",
   "prefer_related_applications": false,
+  "related_applications": [],
   "shortcuts": [
     {
       "name": "Add Risk",
       "short_name": "Risk",
       "description": "Add a new risk item",
-      "url": "/index.html?action=add-risk",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+      "url": "/?action=add-risk",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "View Matrix",
       "short_name": "Matrix",
       "description": "View risk matrix",
-      "url": "/index.html?tab=matrix",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+      "url": "/?tab=matrix",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
-  ]
+  ],
+  "screenshots": [],
+  "iarc_rating_id": "",
+  "edge_side_panel": {
+    "preferred_width": 480
+  }
 }
