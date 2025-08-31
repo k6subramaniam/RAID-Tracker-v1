@@ -13,6 +13,51 @@ app.get('/health', (req, res) => {
     res.json({ status: 'ok', message: 'AI Proxy Server is running' });
 });
 
+// Demo/test endpoint that doesn't require real API key
+app.post('/api/demo', async (req, res) => {
+    const { prompt } = req.body;
+    console.log('Demo API called with prompt:', prompt.substring(0, 100) + '...');
+    
+    // Simulate AI response for testing
+    const demoResponse = `## Executive Summary (Demo Mode)
+
+**Note: This is a simulated response for testing. Configure a real API key for actual AI analysis.**
+
+### Executive Overview
+Based on the RAID items provided, the portfolio shows a balanced distribution of risks, assumptions, issues, and dependencies. Key concerns include resource allocation and timeline management.
+
+### Risk Assessment
+- **Critical Risks**: 2 high-priority items requiring immediate attention
+- **Medium Risks**: 3 items for monitoring
+- **Low Risks**: 1 item tracked for awareness
+
+### Priority Breakdown
+- High Priority: 33% of total items
+- Medium Priority: 50% of total items  
+- Low Priority: 17% of total items
+
+### Strategic Recommendations
+1. Focus on high-priority risk mitigation
+2. Review resource allocation for critical workstreams
+3. Establish weekly review cadence for priority items
+4. Update risk register with latest assessments
+
+### Next Steps
+- Schedule executive review meeting
+- Assign risk owners for unassigned items
+- Update mitigation strategies for high-priority risks
+
+*This is a demo response. Configure your AI provider API key in Settings for real analysis.*`;
+    
+    res.json({
+        choices: [{
+            message: {
+                content: demoResponse
+            }
+        }]
+    });
+});
+
 // Proxy endpoint for AI API calls
 app.post('/api/ai-proxy', async (req, res) => {
     const { provider, endpoint, headers, body } = req.body;

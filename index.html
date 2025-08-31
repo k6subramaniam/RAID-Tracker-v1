@@ -1399,9 +1399,11 @@ Analysis criteria:
         async function callAI(prompt) {
             const provider = aiProviders[aiConfig.provider];
             const apiKey = apiKeys[aiConfig.provider];
+            const isDemoMode = !apiKey || !apiKey.trim();
             
-            if (!provider || !apiKey) {
-                throw new Error(`Provider ${aiConfig.provider} or API key not configured`);
+            // Allow demo mode without API key
+            if (!provider && !isDemoMode) {
+                throw new Error(`Provider ${aiConfig.provider} not configured`);
             }
 
             let headers = {};
@@ -1471,18 +1473,23 @@ Analysis criteria:
                 
                 if (proxyCheck && proxyCheck.ok) {
                     console.log('Using AI proxy server for API call');
+                    
+                    // Use demo endpoint if no API key
+                    const proxyEndpoint = isDemoMode ? `${PROXY_URL}/api/demo` : `${PROXY_URL}/api/ai-proxy`;
+                    const proxyBody = isDemoMode ? { prompt } : {
+                        provider: aiConfig.provider,
+                        endpoint: endpoint,
+                        headers: headers,
+                        body: requestBody
+                    };
+                    
                     // Use proxy server
-                    const proxyResponse = await fetch(`${PROXY_URL}/api/ai-proxy`, {
+                    const proxyResponse = await fetch(proxyEndpoint, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({
-                            provider: aiConfig.provider,
-                            endpoint: endpoint,
-                            headers: headers,
-                            body: requestBody
-                        })
+                        body: JSON.stringify(proxyBody)
                     });
                     
                     if (!proxyResponse.ok) {
@@ -1642,9 +1649,14 @@ Analysis criteria:
             }
 
             const currentApiKey = apiKeys[aiConfig.provider];
-            if (!currentApiKey || !currentApiKey.trim()) {
-                showAlert(`Please configure your ${aiConfig.provider} API key in Settings to use AI features.`);
-                return;
+            const isDemoMode = !currentApiKey || !currentApiKey.trim();
+            
+            if (isDemoMode) {
+                const useDemoMode = confirm('No API key configured. Would you like to use Demo Mode to test AI features?\n\nNote: Demo mode provides simulated responses for testing purposes.');
+                if (!useDemoMode) {
+                    showAlert(`Please configure your ${aiConfig.provider} API key in Settings to use real AI features.`);
+                    return;
+                }
             }
 
             showLoadingModal('Generating Executive Summary...');
