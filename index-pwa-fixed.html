@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#5D5CDE">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    <title>RAIDMASTER - Professional RAID Management System</title>
+    <script>
+        // Register service worker immediately
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw-fast.js')
+                .then(reg => {
+                    console.log('Service Worker registered immediately:', reg);
+                    // Force immediate activation
+                    if (reg.waiting) {
+                        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+                    }
+                })
+                .catch(err => console.log('Service Worker registration failed:', err));
+        }
+    </script>
+</head>
+<body>
+    <div id="app">
+        <h1>RAIDMASTER</h1>
+        <p>Professional RAID Management System</p>
+        <p>PWA Ready for Android Conversion</p>
+    </div>
+</body>
+</html>

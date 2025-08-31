@@ -17,8 +17,6 @@ const mimeTypes = {
 };
 
 const server = http.createServer((req, res) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
-  
   let filePath = '.' + req.url;
   if (filePath === './') {
     filePath = './index.html';
@@ -30,25 +28,16 @@ const server = http.createServer((req, res) => {
   fs.readFile(filePath, (error, content) => {
     if (error) {
       if (error.code === 'ENOENT') {
-        // Try to serve index.html as fallback
-        fs.readFile('./index.html', (error, content) => {
-          if (error) {
-            res.writeHead(404);
-            res.end('Not Found');
-          } else {
-            res.writeHead(200, { 'Content-Type': 'text/html' });
-            res.end(content, 'utf-8');
-          }
-        });
+        res.writeHead(404, { 'Content-Type': 'text/html' });
+        res.end('<h1>404 - File Not Found</h1>', 'utf-8');
       } else {
         res.writeHead(500);
-        res.end(`Server Error: ${error.code}`);
+        res.end('Server Error: ' + error.code, 'utf-8');
       }
     } else {
       res.writeHead(200, { 
         'Content-Type': contentType,
-        'Access-Control-Allow-Origin': '*',
-        'Cache-Control': 'public, max-age=0'
+        'Access-Control-Allow-Origin': '*'
       });
       res.end(content, 'utf-8');
     }
@@ -57,20 +46,17 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`PWA Server running at http://0.0.0.0:${PORT}/`);
-  console.log(`Server started at ${new Date().toISOString()}`);
+  console.log('Serving files from:', __dirname);
 });
 
-// Handle graceful shutdown
+// Keep process alive
 process.on('SIGTERM', () => {
-  console.log('SIGTERM signal received: closing HTTP server');
-  server.close(() => {
-    console.log('HTTP server closed');
-  });
+  console.log('SIGTERM received, keeping server running...');
 });
 
 process.on('SIGINT', () => {
-  console.log('SIGINT signal received: closing HTTP server');
+  console.log('SIGINT received, shutting down gracefully...');
   server.close(() => {
-    console.log('HTTP server closed');
+    process.exit(0);
   });
 });
