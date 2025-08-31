@@ -1449,6 +1449,69 @@ Analysis criteria:
                 };
             }
 
+            // First, try to use the AI proxy server if available
+            const PROXY_PORT = 3001;
+            // Construct proxy URL based on the current hostname pattern
+            let PROXY_URL;
+            if (window.location.hostname.includes('e2b.dev')) {
+                // Running in E2B sandbox - use the pattern for proxy URL
+                PROXY_URL = window.location.protocol + '//' + 
+                           window.location.hostname.replace(/8080/, '3001');
+            } else {
+                // Local development or other environment
+                PROXY_URL = window.location.protocol + '//' + window.location.hostname + ':' + PROXY_PORT;
+            }
+            
+            try {
+                // Check if proxy server is available
+                const proxyCheck = await fetch(`${PROXY_URL}/health`, { 
+                    method: 'GET',
+                    mode: 'cors'
+                }).catch(() => null);
+                
+                if (proxyCheck && proxyCheck.ok) {
+                    console.log('Using AI proxy server for API call');
+                    // Use proxy server
+                    const proxyResponse = await fetch(`${PROXY_URL}/api/ai-proxy`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            provider: aiConfig.provider,
+                            endpoint: endpoint,
+                            headers: headers,
+                            body: requestBody
+                        })
+                    });
+                    
+                    if (!proxyResponse.ok) {
+                        const errorData = await proxyResponse.json();
+                        throw new Error(`API call failed: ${errorData.message || proxyResponse.statusText}`);
+                    }
+                    
+                    const data = await proxyResponse.json();
+                    
+                    // Show proxy success indicator
+                    showProxyIndicator();
+                    
+                    // Extract response based on provider
+                    let content = '';
+                    if (aiConfig.provider === 'OpenAI') {
+                        content = data.choices[0].message.content;
+                    } else if (aiConfig.provider === 'Anthropic') {
+                        content = data.content[0].text;
+                    } else if (aiConfig.provider === 'Gemini') {
+                        content = data.candidates[0].content.parts[0].text;
+                    }
+                    
+                    return content;
+                }
+            } catch (proxyError) {
+                console.log('Proxy server not available, trying direct API call');
+            }
+
+            // Fall back to direct API call
             try {
                 const response = await fetch(endpoint, {
                     method: 'POST',
@@ -1480,6 +1543,22 @@ Analysis criteria:
                     throw new Error('CORS_ERROR');
                 }
                 throw error;
+            }
+        }
+        
+        function showProxyIndicator() {
+            const existingIndicator = document.getElementById('ai-proxy-indicator');
+            if (!existingIndicator) {
+                const indicator = document.createElement('div');
+                indicator.id = 'ai-proxy-indicator';
+                indicator.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs shadow-lg z-40 transition-opacity duration-500';
+                indicator.innerHTML = '✅ AI Proxy Active';
+                document.body.appendChild(indicator);
+                
+                // Auto-fade after 3 seconds
+                setTimeout(() => {
+                    indicator.style.opacity = '0.3';
+                }, 3000);
             }
         }
 
